@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{% block title %}Inventory | {{ SITE_NAME }}{% endblock %}
+{% block content %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-bordered w-50 mb-3">
+                <tr>
+                    <th>Product ID</th>
+                    <td>P001</td>
+                </tr>
+                <tr>
+                    <th>Product Name</th>
+                    <td>Coca Cola</td>
+                </tr>
+                <tr>
+                    <th>Price</th>
+                    <td>$ 1.25</td>
+                </tr>
+                <tr>
+                    <th>Quantity</th>
+                    <td>5 Can</td>
+                </tr>
+                <tr>
+                    <th>Order Level</th>
+                    <td>
+                        <p class="badge badge-danger">Very Low</p>
+                    </td>
+                </tr>
+            </table>
+            <a href="{% url "inventory:edit" %}" class="btn btn-primary">Edit</a>
+            <a href="{% url "inventory:list" %}" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+{% endblock %}
