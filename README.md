@@ -20,9 +20,15 @@ List any things you need to install to use this software.
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com
-cd your-repo-name
-npm install
+git clone https://github.com/MonyVisaSU4/stock_inventory_django_final.git
+
+cd stock_inventory_django_final
+
+python -m venv .venv
+
+.venv\Scripts\activate
+
+pip install -r requirements.txt
 ```
 
 ## Usage
