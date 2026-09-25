@@ -24,11 +24,19 @@ git clone https://github.com/MonyVisaSU4/stock_inventory_django_final.git
 
 cd stock_inventory_django_final
 
+git checkout -b "feature/your_name"
+
 python -m venv .venv
 
 .venv\Scripts\activate
 
 pip install -r requirements.txt
+
+git add .
+
+git commit -m "your_message"
+
+git push origin -u "feature/your_name"
 ```
 
 ## Usage
