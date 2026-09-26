@@ -53,4 +53,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## License
 
-[MIT](https://choosealicense.com)
+[MIT](https://www.figma.com/make/e2q6ui2yIICVseF8UAPvQi/Stock-Inventory-Management-UI?t=PaBkqk5D23GxcKta-1)
