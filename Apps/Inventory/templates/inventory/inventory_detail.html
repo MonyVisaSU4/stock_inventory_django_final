@@ -18,12 +18,30 @@
                 </tr>
                 <tr>
                     <th>Quantity</th>
-                    <td>5 Can</td>
+                    <td>
+{#                        {% with quantity=5 %}#}
+{#                            {{ quantity }} Can#}
+{#                        {% endwith %}#}
+                        5 Can
+                    </td>
                 </tr>
                 <tr>
-                    <th>Order Level</th>
+                    <th>Reorder Level</th>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <th>Stock Status</th>
                     <td>
-                        <p class="badge badge-danger">Very Low</p>
+{#                        {% with quantity=5 reorder_level=3 %}#}
+{#                            {% if quantity == 0 %}#}
+{#                                <span class="badge badge-danger">Out of Stock</span>#}
+{#                            {% elif quantity <= reorder_level %}#}
+{#                                <span class="badge badge-warning">Very Low</span>#}
+{#                            {% else %}#}
+{#                                <span class="badge badge-success">In Stock</span>#}
+{#                            {% endif %}#}
+{#                        {% endwith %}#}
+                        <span class="badge badge-success">In Stock</span>
                     </td>
                 </tr>
             </table>
