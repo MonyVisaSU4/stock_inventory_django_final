@@ -44,7 +44,7 @@ git push origin -u "feature/your_name"
 Provide instructions and examples for use:
 
 ```bash
-npm run start
+python manage.py runserver
 ```
 
 ## Contributing
