@@ -1,49 +1,66 @@
 {% extends 'core/base.html' %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title }} | {{ SITE_NAME }}{% endblock %}
 {% block content %}
-    <div class="card shadow-sm">
+
+    {# ─── Page Header ─── #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">{{ title }}</h2>
+            <p class="text-muted mb-0">
+                {% if title == 'Add Product' %}
+                    Fill in the details below to register a new product.
+                    Quantity starts at 0 and is managed via the Stock page.
+                {% else %}
+                    Update the product details below.
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">
+            <i class="mdi mdi-arrow-left me-1"></i> Back
+        </a>
+    </div>
+
+    <div class="card shadow-sm" style="max-width: 700px;">
         <div class="card-body">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {##}
-                {#                {% if form.non_field_errors %}#}
-                {#                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>#}
-                {#                {% endif %}#}
 
+                {# ── Row 1: Name + Category ── #}
                 <div class="row">
                     <div class="mb-3 col-md-6">
-                        <label for="id_product_name" class="form-label">Product Name</label>
+                        <label for="id_product_name" class="form-label">
+                            Product Name <span class="text-danger">*</span>
+                        </label>
                         <input type="text"
                                name="product_name"
-                               maxlength="20"
+                               maxlength="100"
                                class="form-control"
-                               placeholder="product name"
+                               placeholder="e.g. Coca Cola 330ml"
                                required
                                id="id_product_name">
-                        {#                        {% for error in form.product_name.errors %}#}
-                        {#                            <div class="text-danger small">{{ error }}</div>#}
-                        {#                        {% endfor %}#}
                     </div>
 
                     <div class="mb-3 col-md-6">
-                        <label for="id_category" class="form-label">Category</label>
-                        <select name="category"
-                                class="form-control"
-                                required
-                                id="id_category">
+                        <label for="id_category" class="form-label">
+                            Category <span class="text-danger">*</span>
+                        </label>
+                        <select name="category" class="form-control" required id="id_category">
                             <option value="">-- Select Category --</option>
                             <option value="drink">Drink</option>
                             <option value="snack">Snack</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="other">Other</option>
                         </select>
-                        {#                        {% for error in form.category.errors %}#}
-                        {#                            <div class="text-danger small">{{ error }}</div>#}
-                        {#                        {% endfor %}#}
                     </div>
                 </div>
 
+                {# ── Row 2: Unit Price + Reorder Level ── #}
                 <div class="row">
                     <div class="mb-3 col-md-6">
-                        <label for="id_price" class="form-label">Unit Price</label>
+                        <label for="id_price" class="form-label">
+                            Unit Price ($) <span class="text-danger">*</span>
+                        </label>
                         <input type="number"
                                name="price"
                                step="0.01"
@@ -52,27 +69,56 @@
                                placeholder="0.00"
                                required
                                id="id_price">
-                        {#                        {% for error in form.price.errors %}#}
-                        {#                            <div class="text-danger small">{{ error }}</div>#}
-                        {#                        {% endfor %}#}
                     </div>
 
                     <div class="mb-3 col-md-6">
-                        <label for="id_barcode" class="form-label">Barcode / SKU <span class="text-muted">(optional)</span></label>
-                        <input type="text"
-                               name="barcode"
-                               maxlength="30"
+                        <label for="id_reorder_level" class="form-label">
+                            Reorder Level <span class="text-danger">*</span>
+                        </label>
+                        <input type="number"
+                               name="reorder_level"
+                               min="0"
                                class="form-control"
-                               placeholder="barcode or SKU"
-                               id="id_barcode">
-                        {#                        {% for error in form.barcode.errors %}#}
-                        {#                            <div class="text-danger small">{{ error }}</div>#}
-                        {#                        {% endfor %}#}
+                               placeholder="e.g. 10"
+                               required
+                               id="id_reorder_level">
+                        <div class="form-text text-muted">
+                            A "Very Low" badge shows when stock falls to or below this number.
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
-                <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                {# ── Row 3: Barcode (optional) ── #}
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label for="id_barcode" class="form-label">
+                            Barcode / SKU <span class="text-muted">(optional)</span>
+                        </label>
+                        <input type="text"
+                               name="barcode"
+                               maxlength="50"
+                               class="form-control"
+                               placeholder="e.g. 5000112637922"
+                               id="id_barcode">
+                    </div>
+                </div>
+
+                {# ── Note: no Quantity field — quantity starts at 0 and is only changed via Stock page ── #}
+                <div class="alert alert-info py-2 px-3 small mb-4">
+                    <i class="mdi mdi-information-outline me-1"></i>
+                    <strong>Note:</strong> Quantity is not set here. It always starts at <strong>0</strong>
+                    and can only be changed by logging a Stock Movement on the
+                    <a href="{% url 'stock:list' %}">Stock page</a>.
+                </div>
+
+                {# ── Buttons ── #}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="mdi mdi-check me-1"></i> Save Product
+                    </button>
+                    <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+
             </form>
         </div>
     </div>

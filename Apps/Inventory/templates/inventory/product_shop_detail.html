@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+{% block title %}Coca Cola | {{ SITE_NAME }}{% endblock %}
+{% block content %}
+
+    {# ─── Page Header ─── #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Product Detail</h2>
+            <p class="text-muted mb-0">Product information and availability.</p>
+        </div>
+        <a href="{% url 'shop:list' %}" class="btn btn-outline-secondary">
+            <i class="mdi mdi-arrow-left me-1"></i> Back to Products
+        </a>
+    </div>
+
+    <div class="row">
+
+        {# ─── Product Info Card ─── #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-package-variant me-2"></i>Coca Cola
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0">
+                        <tr>
+                            <th class="bg-light" style="width:45%">Product Name</th>
+                            <td class="fw-semibold">Coca Cola</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Category</th>
+                            <td><span class="badge badge-info">Drink</span></td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Unit Price</th>
+                            <td>$ 1.25</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Stock Status</th>
+                            <td>
+                                {#
+                                  Customer view stock rules:
+                                  - qty == 0           → Out of Stock (red)
+                                  - qty <= reorder     → Only X left  (red/orange)
+                                  - qty  > reorder     → In Stock     (green)
+                                  Exact qty is NOT shown unless qty <= reorder_level
+                                #}
+                                <span class="badge badge-danger">Only 10 left</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {# ─── Buy / Request Card ─── #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-cart-outline me-2"></i>Purchase
+                    </h5>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-between">
+
+                    <div class="mb-3">
+                        <p class="text-muted">
+                            This product is currently available. Place your request with the
+                            store staff or proceed to purchase.
+                        </p>
+                        <div class="mb-3">
+                            <label for="id_buy_qty" class="form-label fw-semibold">Quantity</label>
+                            <input type="number" id="id_buy_qty" min="1" max="10"
+                                   class="form-control" value="1" style="max-width:120px">
+                            <div class="form-text text-muted small">Max: 10 units per order.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {# Buy button — disabled when Out of Stock #}
+                        <button type="button" class="btn btn-success">
+                            <i class="mdi mdi-cart me-1"></i> Buy
+                        </button>
+                        <a href="{% url 'shop:list' %}" class="btn btn-outline-secondary">
+                            Continue Shopping
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'core/base.html' %}
+{% block title %}Log Stock Movement | {{ SITE_NAME }}{% endblock %}
+{% block content %}
+
+    {# ─── Page Header ─── #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Log Stock Movement</h2>
+            <p class="text-muted mb-0">Record a stock-in or stock-out transaction for a product.</p>
+        </div>
+        <a href="{% url 'stock:list' %}" class="btn btn-outline-secondary">
+            <i class="mdi mdi-arrow-left me-1"></i> Back to Stock
+        </a>
+    </div>
+
+    <div class="card shadow-sm" style="max-width: 640px;">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                {# ── Product ── #}
+                <div class="mb-3">
+                    <label for="id_product" class="form-label">
+                        Product <span class="text-danger">*</span>
+                    </label>
+                    <select name="product" class="form-control" required id="id_product">
+                        <option value="">-- Select Product --</option>
+                        <option value="1">Coca Cola</option>
+                        <option value="2">Sprite</option>
+                        <option value="3">Lay's Chips</option>
+                    </select>
+                </div>
+
+                {# ── Type (In / Out) ── #}
+                <div class="mb-3">
+                    <label class="form-label">
+                        Movement Type <span class="text-danger">*</span>
+                    </label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio"
+                                   name="movement_type" id="type_in" value="IN" required>
+                            <label class="form-check-label text-success fw-semibold" for="type_in">
+                                <i class="mdi mdi-arrow-down-circle-outline me-1"></i> Stock In
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio"
+                                   name="movement_type" id="type_out" value="OUT">
+                            <label class="form-check-label text-danger fw-semibold" for="type_out">
+                                <i class="mdi mdi-arrow-up-circle-outline me-1"></i> Stock Out
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {# ── Quantity ── #}
+                <div class="mb-3">
+                    <label for="id_quantity" class="form-label">
+                        Quantity <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           name="quantity"
+                           min="1"
+                           class="form-control"
+                           placeholder="e.g. 24"
+                           required
+                           id="id_quantity"
+                           style="max-width:200px">
+                </div>
+
+                {# ── Reason ── #}
+                <div class="mb-3">
+                    <label for="id_reason" class="form-label">
+                        Reason <span class="text-danger">*</span>
+                    </label>
+                    <select name="reason" class="form-control" required id="id_reason"
+                            onchange="document.getElementById('reason-other-wrap').style.display =
+                                      this.value === 'other' ? 'block' : 'none'">
+                        <option value="">-- Select Reason --</option>
+                        <optgroup label="Stock In">
+                            <option value="purchase">Purchase / Restock</option>
+                            <option value="return">Customer Return</option>
+                            <option value="initial">Initial Stock</option>
+                        </optgroup>
+                        <optgroup label="Stock Out">
+                            <option value="sale">Sale to Customer</option>
+                            <option value="damaged">Damaged / Expired</option>
+                            <option value="loss">Loss / Theft</option>
+                        </optgroup>
+                        <optgroup label="General">
+                            <option value="other">Other (specify below)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                {# ── Other Reason (conditional) ── #}
+                <div class="mb-3" id="reason-other-wrap" style="display:none">
+                    <label for="id_reason_other" class="form-label">Specify Reason</label>
+                    <input type="text"
+                           name="reason_other"
+                           maxlength="200"
+                           class="form-control"
+                           placeholder="Describe the reason..."
+                           id="id_reason_other">
+                </div>
+
+                {# ── Note (optional) ── #}
+                <div class="mb-4">
+                    <label for="id_note" class="form-label">
+                        Additional Note <span class="text-muted">(optional)</span>
+                    </label>
+                    <textarea name="note" rows="2" class="form-control"
+                              placeholder="Any extra context..."
+                              id="id_note"></textarea>
+                </div>
+
+                {# ── Buttons ── #}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="mdi mdi-check me-1"></i> Save Movement
+                    </button>
+                    <a href="{% url 'stock:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

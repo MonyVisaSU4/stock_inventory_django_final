@@ -1,0 +1,98 @@
+{% extends 'core/base.html' %}
+{% block title %}Stock Take | {{ SITE_NAME }}{% endblock %}
+{% block content %}
+
+    {# ─── Page Header ─── #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Stock Take / Audit</h2>
+            <p class="text-muted mb-0">
+                Correct a product's quantity to match your physical count.
+                This logs an <strong>Adjustment</strong> movement.
+            </p>
+        </div>
+        <a href="{% url 'stock:list' %}" class="btn btn-outline-secondary">
+            <i class="mdi mdi-arrow-left me-1"></i> Back to Stock
+        </a>
+    </div>
+
+    {# ─── Info alert ─── #}
+    <div class="alert alert-info py-2 px-3 small mb-4" style="max-width:640px">
+        <i class="mdi mdi-information-outline me-1"></i>
+        A Stock Take <strong>overrides</strong> the current system quantity with the actual
+        counted value. The system will automatically record the difference as an adjustment
+        transaction for audit purposes.
+    </div>
+
+    <div class="card shadow-sm" style="max-width: 640px;">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                {# ── Product ── #}
+                <div class="mb-3">
+                    <label for="id_st_product" class="form-label">
+                        Product <span class="text-danger">*</span>
+                    </label>
+                    <select name="product" class="form-control" required id="id_st_product">
+                        <option value="">-- Select Product --</option>
+                        <option value="1">Coca Cola &nbsp;(Current system qty: 10)</option>
+                        <option value="2">Sprite &nbsp;(Current system qty: 50)</option>
+                        <option value="3">Lay's Chips &nbsp;(Current system qty: 0)</option>
+                    </select>
+                </div>
+
+                {# ── Actual Counted Quantity ── #}
+                <div class="mb-3">
+                    <label for="id_actual_qty" class="form-label">
+                        Actual Counted Quantity <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           name="actual_quantity"
+                           min="0"
+                           class="form-control"
+                           placeholder="Enter the physical count"
+                           required
+                           id="id_actual_qty"
+                           style="max-width:200px">
+                    <div class="form-text text-muted">
+                        Enter the exact number of units you physically counted.
+                    </div>
+                </div>
+
+                {# ── Count Date ── #}
+                <div class="mb-3">
+                    <label for="id_count_date" class="form-label">
+                        Count Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="count_date"
+                           class="form-control"
+                           required
+                           id="id_count_date"
+                           style="max-width:200px">
+                </div>
+
+                {# ── Note (optional) ── #}
+                <div class="mb-4">
+                    <label for="id_st_note" class="form-label">
+                        Note <span class="text-muted">(optional)</span>
+                    </label>
+                    <textarea name="note" rows="2" class="form-control"
+                              placeholder="e.g. Monthly stock take, items found damaged..."
+                              id="id_st_note"></textarea>
+                </div>
+
+                {# ── Buttons ── #}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-warning text-dark">
+                        <i class="mdi mdi-clipboard-check-outline me-1"></i> Submit Stock Take
+                    </button>
+                    <a href="{% url 'stock:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

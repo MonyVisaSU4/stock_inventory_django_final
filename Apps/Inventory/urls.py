@@ -5,8 +5,9 @@ from . import views
 app_name = 'inventory'
 
 urlpatterns = [
+    # ── Admin / Staff routes ──
     path('', views.inventory_list, name='list'),
     path('/detail', views.inventory_detail, name='detail'),
     path('/add', views.add_inventory, name='add'),
-    path('/edit', views.edit_inventory, name='edit')
+    path('/edit', views.edit_inventory, name='edit'),
 ]

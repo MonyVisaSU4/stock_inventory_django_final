@@ -60,23 +60,16 @@
         </li>
 {##}
         <li class="nav-item">
-            <a class="nav-link"
-{#               data-bs-toggle="collapse" #}
+            <a class="nav-link {% if request.resolver_match.namespace == 'stock' %}active{% endif %}"
                href="{% url 'stock:list' %}"
-{#               aria-expanded="false"#}
-{#               aria-controls="form-elements"#}
             >
-                <i class="menu-icon mdi mdi-card-text-outline"></i>
+                <i class="menu-icon mdi mdi-swap-vertical-bold"></i>
                 <span class="menu-title">Stock</span>
-{#                <i class="menu-arrow"></i>#}
             </a>
-{#            <div class="collapse" id="form-elements">#}
-{#                <ul class="nav flex-column sub-menu">#}
-{#                    <li class="nav-item"><a class="nav-link" href="pages/forms/basic_elements.html">Basic Elements</a>#}
-{#                    </li>#}
-{#                </ul>#}
-{#            </div>#}
         </li>
+
+        {# ── Placeholder for future Customer-only nav items ── #}
+        {# {% if user.role == 'customer' %} ... {% endif %} #}
 {#        <li class="nav-item">#}
 {#            <a class="nav-link" data-bs-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">#}
 {#                <i class="menu-icon mdi mdi-chart-line"></i>#}

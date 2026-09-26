@@ -1,71 +1,135 @@
 {% extends 'core/base.html' %}
 {% block title %}Inventory | {{ SITE_NAME }}{% endblock %}
 {% block content %}
-    <div class="col-5 grid-margin-md-2 d-flex align-items-start gap-2 mb-3">
-        <form class="forms-sample mb-0 d-flex gap-2" method="get">
-            <div class="form-group mb-0">
-                <input type="text" name="q" class="form-control" style="max-width:300px"
-                       placeholder="Search Product Name...">
-            </div>
 
-            <div class="form-group mb-0 bg-white">
-                <select name="category" id="category-select" class="form-control" style="max-width:200px"
-                        onchange="document.getElementById('category-other').style.display = this.value === 'other' ? 'block' : 'none'">
-                    <option value="">All Categories</option>
-                    <option value="electronics">Drink</option>
-                    <option value="groceries">Accessories</option>
-                    <option value="clothing">Clothing</option>
-                    <option value="other">Other</option>
-                </select>
-
-                <input type="text" name="category_other" id="category-other"
-                       class="form-control mt-2 position-absolute z-3"
-                       style="max-width:200px; display:none" placeholder="Enter category">
-            </div>
-
-            <button type="submit" class="btn btn-secondary">Filter</button>
-        </form>
-
-        <a href="/inventory/add" class="btn btn-primary">Add Inventory</a>
+    {# ─── Page Header ─── #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Inventory</h2>
+            <p class="text-muted mb-0">Manage your products and stock levels.</p>
+        </div>
+        <a href="{% url 'inventory:add' %}" class="btn btn-primary">
+            <i class="mdi mdi-plus me-1"></i> Add Product
+        </a>
     </div>
+
+    {# ─── Search & Filter Bar ─── #}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body py-3">
+            <form class="d-flex flex-wrap gap-2 align-items-end mb-0" method="get">
+                <div class="form-group mb-0">
+                    <label class="form-label small text-muted mb-1">Search</label>
+                    <input type="text" name="q" value="{{ request.GET.q }}"
+                           class="form-control" style="min-width:220px"
+                           placeholder="Search product name...">
+                </div>
+
+                <div class="form-group mb-0 position-relative">
+                    <label class="form-label small text-muted mb-1">Category</label>
+                    <select name="category" id="category-select" class="form-control" style="min-width:170px"
+                            onchange="document.getElementById('category-other').style.display = this.value === 'other' ? 'block' : 'none'">
+                        <option value="">All Categories</option>
+                        <option value="drink"       {% if request.GET.category == 'drink'       %}selected{% endif %}>Drink</option>
+                        <option value="snack"       {% if request.GET.category == 'snack'       %}selected{% endif %}>Snack</option>
+                        <option value="accessories" {% if request.GET.category == 'accessories' %}selected{% endif %}>Accessories</option>
+                        <option value="clothing"    {% if request.GET.category == 'clothing'    %}selected{% endif %}>Clothing</option>
+                        <option value="other"       {% if request.GET.category == 'other'       %}selected{% endif %}>Other</option>
+                    </select>
+                    <input type="text" name="category_other" id="category-other"
+                           class="form-control mt-1 position-absolute z-3"
+                           style="min-width:170px; display:none" placeholder="Enter category">
+                </div>
+
+                <div class="form-group mb-0 d-flex gap-2 align-self-end">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="mdi mdi-filter-outline me-1"></i> Filter
+                    </button>
+                    <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# ─── Inventory Table ─── #}
     <div class="col-lg-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th> Name</th>
-                            <th> Type</th>
-                            <th> Unit Price</th>
-                            <th> Quantity In Stock</th>
-                            <th> Total Value</th>
-                            <th> Reorder Level</th>
-                            <th> Action</th>
-                        </tr>
+                    <table class="table table-bordered table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Unit Price</th>
+                                <th>Qty in Stock</th>
+                                <th>Total Value</th>
+                                <th>Reorder Level</th>
+                                <th class="text-center">Action</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr class="hover-cursor"
-                            onclick='window.location.assign("{% url "inventory:detail" %}")'>
-                            <td class="py-1">
-                                <p>Coca Cola</p>
-                            </td>
-                            <td>
-                                <p class="badge badge-info">Drink</p>
-                            </td>
-                            <td>
-                                $ 1.25
-                            </td>
-                            <td>10</td>
-                            <td>$ 12.5</td>
-                            <td>
-                                <p class="badge badge-danger">Very Low</p>
-                            </td>
-                            <td>
-                                <a onclick="event.stopPropagation(); handleDelete()" class="btn btn-danger">Delete</a>
-                                <a href="{% url "inventory:edit" %}" class="btn btn-info">Edit</a>
-                            </td>
-                        </tr>
+
+                            {# ── Sample Row 1 ── #}
+                            <tr class="hover-cursor"
+                                onclick='window.location.assign("{% url "inventory:detail" %}")'>
+                                <td class="text-muted small">1</td>
+                                <td class="py-1 fw-semibold">Coca Cola</td>
+                                <td><span class="badge badge-info">Drink</span></td>
+                                <td>$ 1.25</td>
+                                <td>10</td>
+                                <td>$ 12.50</td>
+                                <td><span class="badge badge-danger">Very Low</span></td>
+                                <td class="text-center" onclick="event.stopPropagation()">
+                                    <a href="{% url "inventory:edit" %}" class="btn btn-sm btn-info me-1">
+                                        <i class="mdi mdi-pencil"></i> Edit
+                                    </a>
+                                    <a onclick="handleDelete()" class="btn btn-sm btn-danger">
+                                        <i class="mdi mdi-delete"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+
+                            {# ── Sample Row 2 ── #}
+                            <tr class="hover-cursor"
+                                onclick='window.location.assign("{% url "inventory:detail" %}")'>
+                                <td class="text-muted small">2</td>
+                                <td class="py-1 fw-semibold">Sprite</td>
+                                <td><span class="badge badge-info">Drink</span></td>
+                                <td>$ 1.10</td>
+                                <td>50</td>
+                                <td>$ 55.00</td>
+                                <td><span class="badge badge-success">In Stock</span></td>
+                                <td class="text-center" onclick="event.stopPropagation()">
+                                    <a href="{% url "inventory:edit" %}" class="btn btn-sm btn-info me-1">
+                                        <i class="mdi mdi-pencil"></i> Edit
+                                    </a>
+                                    <a onclick="handleDelete()" class="btn btn-sm btn-danger">
+                                        <i class="mdi mdi-delete"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+
+                            {# ── Sample Row 3 ── #}
+                            <tr class="hover-cursor"
+                                onclick='window.location.assign("{% url "inventory:detail" %}")'>
+                                <td class="text-muted small">3</td>
+                                <td class="py-1 fw-semibold">Lay's Chips</td>
+                                <td><span class="badge" style="background:#6c757d">Snack</span></td>
+                                <td>$ 0.99</td>
+                                <td>0</td>
+                                <td>$ 0.00</td>
+                                <td><span class="badge badge-danger">Out of Stock</span></td>
+                                <td class="text-center" onclick="event.stopPropagation()">
+                                    <a href="{% url "inventory:edit" %}" class="btn btn-sm btn-info me-1">
+                                        <i class="mdi mdi-pencil"></i> Edit
+                                    </a>
+                                    <a onclick="handleDelete()" class="btn btn-sm btn-danger">
+                                        <i class="mdi mdi-delete"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -93,14 +157,13 @@
             }).then((result) => {
                 if (result.isConfirmed) swalWithBootstrapButtons.fire({
                     title: "Deleted!",
-                    text: "Your file has been deleted.",
+                    text: "The product has been deleted.",
                     icon: "success"
                 });
                 else if (result.dismiss === Swal.DismissReason.cancel)
-                    /* Read more about handling dismissals below */
                     swalWithBootstrapButtons.fire({
                         title: "Cancelled",
-                        text: "Your imaginary file is safe :)",
+                        text: "The product is safe.",
                         icon: "error"
                     });
             });

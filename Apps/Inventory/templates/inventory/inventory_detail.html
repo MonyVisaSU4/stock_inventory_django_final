@@ -1,52 +1,134 @@
 {% extends 'core/base.html' %}
-{% block title %}Inventory | {{ SITE_NAME }}{% endblock %}
+{% block title %}Product Detail | {{ SITE_NAME }}{% endblock %}
 {% block content %}
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-bordered w-50 mb-3">
-                <tr>
-                    <th>Product ID</th>
-                    <td>P001</td>
-                </tr>
-                <tr>
-                    <th>Product Name</th>
-                    <td>Coca Cola</td>
-                </tr>
-                <tr>
-                    <th>Price</th>
-                    <td>$ 1.25</td>
-                </tr>
-                <tr>
-                    <th>Quantity</th>
-                    <td>
-{#                        {% with quantity=5 %}#}
-{#                            {{ quantity }} Can#}
-{#                        {% endwith %}#}
-                        5 Can
-                    </td>
-                </tr>
-                <tr>
-                    <th>Reorder Level</th>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <th>Stock Status</th>
-                    <td>
-{#                        {% with quantity=5 reorder_level=3 %}#}
-{#                            {% if quantity == 0 %}#}
-{#                                <span class="badge badge-danger">Out of Stock</span>#}
-{#                            {% elif quantity <= reorder_level %}#}
-{#                                <span class="badge badge-warning">Very Low</span>#}
-{#                            {% else %}#}
-{#                                <span class="badge badge-success">In Stock</span>#}
-{#                            {% endif %}#}
-{#                        {% endwith %}#}
-                        <span class="badge badge-success">In Stock</span>
-                    </td>
-                </tr>
-            </table>
-            <a href="{% url "inventory:edit" %}" class="btn btn-primary">Edit</a>
-            <a href="{% url "inventory:list" %}" class="btn btn-secondary">Back</a>
+
+    {# ─── Page Header ─── #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Product Detail</h2>
+            <p class="text-muted mb-0">Full information for this product.</p>
         </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'inventory:edit' %}" class="btn btn-primary">
+                <i class="mdi mdi-pencil me-1"></i> Edit
+            </a>
+            <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">
+                <i class="mdi mdi-arrow-left me-1"></i> Back to Inventory
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+
+        {# ─── Product Info Card ─── #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="mdi mdi-package-variant me-2"></i>Product Information</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0">
+                        <tr>
+                            <th class="bg-light" style="width:40%">Product ID</th>
+                            <td>P001</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Product Name</th>
+                            <td class="fw-semibold">Coca Cola</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Category</th>
+                            <td><span class="badge badge-info">Drink</span></td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Barcode / SKU</th>
+                            <td class="text-muted">N/A</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Unit Price</th>
+                            <td>$ 1.25</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Quantity in Stock</th>
+                            <td>10 units</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Total Value</th>
+                            <td>$ 12.50</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Reorder Level</th>
+                            <td>5 units</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Stock Status</th>
+                            <td>
+                                {# quantity (10) > reorder level (5) → In Stock; if qty==0 → Out of Stock; if qty<=reorder → Very Low #}
+                                <span class="badge badge-danger">Very Low</span>
+                                {# swap the badge above depending on real data later #}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {# ─── Stock Movement Quick Link Card ─── #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="mdi mdi-swap-vertical me-2"></i>Stock Movements</h5>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <p class="text-muted">
+                        Quantity changes for this product are managed through the
+                        <strong>Stock</strong> page — not here. Use the buttons below to log a
+                        movement or correct the count.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <a href="{% url 'stock:movement' %}" class="btn btn-success">
+                            <i class="mdi mdi-plus-circle-outline me-1"></i> Log Stock Movement
+                        </a>
+                        <a href="{% url 'stock:take' %}" class="btn btn-warning">
+                            <i class="mdi mdi-clipboard-check-outline me-1"></i> Stock Take
+                        </a>
+                    </div>
+
+                    {# Mini recent-movements preview (sample data) #}
+                    <div>
+                        <p class="small text-muted mb-2">Recent movements for this product:</p>
+                        <table class="table table-bordered table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Qty</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="small">Sept 25, 2026</td>
+                                    <td><span class="badge badge-danger">Out</span></td>
+                                    <td>5</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <td class="small">Sept 22, 2026</td>
+                                    <td><span class="badge badge-success">In</span></td>
+                                    <td>15</td>
+                                    <td>15</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-2">
+                            <a href="{% url 'stock:list' %}" class="small">View all movements →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
