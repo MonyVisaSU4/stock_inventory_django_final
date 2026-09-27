@@ -32,6 +32,6 @@ def delete_inventory(request):
 
 def add_inventory(request):
     context = {
-        'title': 'Add Inventory'
+        'title': 'Add Item'
     }
     return render(request, 'inventory/inventory_form.html', context)

@@ -10,3 +10,8 @@ def list(request):
         'title': title,
         'desc': desc
     })
+
+def add(request):
+    return render(request, 'stock/stock_form.html', context={
+        'title': 'Add Stock Movement'
+    })

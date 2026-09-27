@@ -26,7 +26,7 @@
             <button type="submit" class="btn btn-secondary">Filter</button>
         </form>
 
-        <a href="/inventory/add" class="btn btn-primary">Add Inventory</a>
+        <a href="/inventory/add" class="btn btn-primary">Add Item</a>
     </div>
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
@@ -36,19 +36,25 @@
                         <thead>
                         <tr>
                             <th> Name</th>
+                            <th> Barcode</th>
                             <th> Type</th>
                             <th> Unit Price</th>
                             <th> Quantity In Stock</th>
-                            <th> Total Value</th>
-                            <th> Reorder Level</th>
+                            <th> Status</th>
                             <th> Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr class="hover-cursor"
                             onclick='window.location.assign("{% url "inventory:detail" %}")'>
-                            <td class="py-1">
+                            <td class="d-flex align-items-center gap-3 py-4">
+                                <img src="https://i.pinimg.com/736x/ad/48/06/ad480659e2a5884248126241bf11a4d6.jpg"
+                                     class="w-15 h-15"
+                                />
                                 <p>Coca Cola</p>
+                            </td>
+                            <td>
+                                2009789
                             </td>
                             <td>
                                 <p class="badge badge-info">Drink</p>
@@ -57,9 +63,8 @@
                                 $ 1.25
                             </td>
                             <td>10</td>
-                            <td>$ 12.5</td>
                             <td>
-                                <p class="badge badge-danger">Very Low</p>
+                                <p class="badge badge-success">In Stock</p>
                             </td>
                             <td>
                                 <a onclick="event.stopPropagation(); handleDelete()" class="btn btn-danger">Delete</a>

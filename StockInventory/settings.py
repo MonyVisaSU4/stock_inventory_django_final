@@ -40,7 +40,8 @@ INSTALLED_APPS = [
 
     'Core',
     'Apps.Inventory',
-    'Apps.Stock'
+    'Apps.Stock',
+    'Apps.Customer'
 ]
 
 MIDDLEWARE = [

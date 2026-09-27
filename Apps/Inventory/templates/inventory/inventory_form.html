@@ -27,14 +27,18 @@
 
                     <div class="mb-3 col-md-6">
                         <label for="id_category" class="form-label">Category</label>
-                        <select name="category"
-                                class="form-control"
-                                required
-                                id="id_category">
-                            <option value="">-- Select Category --</option>
-                            <option value="drink">Drink</option>
-                            <option value="snack">Snack</option>
+                        <select name="category" id="category-select" class="form-control"
+                                onchange="document.getElementById('category-other').style.display = this.value === 'other' ? 'block' : 'none'">
+                            <option value="">-----</option>
+                            <option value="electronics">Drink</option>
+                            <option value="groceries">Accessories</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="other">Other</option>
                         </select>
+
+                        <input type="text" name="category_other" id="category-other"
+                               class="form-control mt-2"
+                               style="max-width:400px; display:none" placeholder="Enter category">
                         {#                        {% for error in form.category.errors %}#}
                         {#                            <div class="text-danger small">{{ error }}</div>#}
                         {#                        {% endfor %}#}
@@ -58,7 +62,7 @@
                     </div>
 
                     <div class="mb-3 col-md-6">
-                        <label for="id_barcode" class="form-label">Barcode / SKU <span class="text-muted">(optional)</span></label>
+                        <label for="id_barcode" class="form-label">Barcode / SKU</label>
                         <input type="text"
                                name="barcode"
                                maxlength="30"
