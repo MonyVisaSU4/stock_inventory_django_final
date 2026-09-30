@@ -9,7 +9,7 @@
 {#        </div>#}
         <div>
             <a class="navbar-brand brand-logo" href="{% url 'core:dashboard' %}">
-                <span class="mdi mdi-account-school-outline"></span> Jolnapu
+                <span class="mdi mdi-account-school-outline"></span> InvenStock
             </a>
             <a class="navbar-brand brand-logo-mini" href="{% url 'core:dashboard' %}">
                 <img src="{% static 'core/assets/images/logo-mini.svg' %}" alt="logo"/>
@@ -89,10 +89,10 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
                      aria-labelledby="notificationDropdown">
-                    <a class="dropdown-item py-3 border-bottom">
-                        <p class="mb-0 fw-medium float-start">You have 4 new notifications </p>
-                        <span class="badge badge-pill badge-primary float-end">View all</span>
-                    </a>
+                    <p id="notititle" class="dropdown-item py-3 border-bottom" style="cursor: default;">
+                        <span class="mb-0 fw-medium float-start">You have 4 new notifications </span>
+                        <span class="badge badge-pill badge-primary float-end opacity-0">View all</span>
+                    </p>
                     <a class="dropdown-item preview-item py-3">
                         <div class="preview-thumbnail">
                             <i class="mdi mdi-alert m-auto text-primary"></i>
@@ -197,3 +197,7 @@
         </button>
     </div>
 </nav>
+
+<script>
+    document.getElementById('notititle').style.pointerEvents = 'none';
+</script>
