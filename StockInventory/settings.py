@@ -42,10 +42,6 @@ INSTALLED_APPS = [
 
     'Core',
     'Apps.Inventory',
-    'Apps.Stock',
-    'Apps.Customer',
-    'Apps.Category',
-    'Apps.Product',
     'Apps.UserManagement',
 ]
 
