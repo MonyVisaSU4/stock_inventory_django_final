@@ -1,0 +1,81 @@
+{% extends 'core/base.html' %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    {% include 'usermanagement/_auth_switch.html' %}
+
+                    <h3 class="card-title mb-1">Create your account</h3>
+                    <p class="text-muted mb-4">Register to start using the Inventory Management System.</p>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">First name</label>
+                                {{ form.first_name }}
+                                {% for error in form.first_name.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">Last name</label>
+                                {{ form.last_name }}
+                                {% for error in form.last_name.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                            {{ form.username }}
+                            {% for error in form.username.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
+                            {{ form.password1 }}
+                            {% for error in form.password1.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text small">{{ form.password1.help_text|safe }}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm password</label>
+                            {{ form.password2 }}
+                            {% for error in form.password2.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Create account</button>
+                    </form>
+
+                    <p class="text-center text-muted small mt-4 mb-0">
+                        Already have an account?
+                        <a href="{% url 'usermanagement:login' %}">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

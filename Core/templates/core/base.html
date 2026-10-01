@@ -4,60 +4,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
-
-    {% include "partial/styleshop.html" %}
-    {% block extra_css %}{% endblock %}
-
-    <style>
-        .kantumruy-regular {
-            font-family: "Kantumruy Pro", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 500;
-            font-style: normal;
-        }
-
-    </style>
+    <title>{% block title %}Inventory Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/assets/vendors/bootstrap/css/bootstrap.min.css' %}">
+    {% include 'partial/styleshop.html' %}
 </head>
+<body class="bg-body-tertiary">
 
-<body class="with-welcome-text">
-<div class="container-scroller">
-    <!-- partial:partials/_navbar.html -->
-    {% include 'core/navbar.html' %}
-    <!-- partial -->
-
-    <div class="container-fluid page-body-wrapper">
-        <!-- partial:partials/_sidebar.html -->
-        {% include 'core/sidebar.html' %}
-        <!-- partial -->
-
-        <div class="main-panel">
-            <div class="content-wrapper">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
-                             role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-                {% block content %}{% endblock %}
+    {% with current=request.resolver_match.url_name %}
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg bg-dark shadow-sm" data-bs-theme="dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{% url 'core:dashboard' %}">
+                <span class="badge text-bg-primary">IM</span>
+                <span class="d-none d-sm-inline">Inventory Management System</span>
+                <span class="d-sm-none">Inventory</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                    <li class="nav-item">
+                        <a class="nav-link {% if current == 'dashboard' %}active{% endif %}" href="{% url 'core:dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if current == 'product_list' or current == 'adjust_stock' %}active{% endif %}" href="{% url 'inventory:product_list' %}">Product Catalog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if current == 'transaction_list' %}active{% endif %}" href="{% url 'inventory:transaction_list' %}">Transaction Audit Log</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item ms-lg-2">
+                        <span class="badge rounded-pill text-bg-info">👤 {{ user.username }}</span>
+                    </li>
+                    <li class="nav-item ms-lg-1">
+                        <form method="post" action="{% url 'usermanagement:logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-sm btn-outline-light {% if current == 'login' %}active{% endif %}" href="{% url 'usermanagement:login' %}">Sign in</a>
+                    </li>
+                    <li class="nav-item ms-lg-1">
+                        <a class="btn btn-sm btn-primary {% if current == 'register' %}active{% endif %}" href="{% url 'usermanagement:register' %}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
-            <!-- content-wrapper ends -->
-
-            <!-- partial:partials/_footer.html -->
-            {% include 'core/footer.html' %}
-            <!-- partial -->
         </div>
-        <!-- main-panel ends -->
-    </div>
-    <!-- page-body-wrapper ends -->
-</div>
-<!-- container-scroller -->
-{% include "partial/jsshop.html" %}
-<!-- End custom js for this page-->
-{% block extra_js %}{% endblock %}
+    </nav>
+    {% endwith %}
+
+    <!-- Main Content Container -->
+    <main class="container my-4">
+
+        <!-- Django Feedback Messages -->
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% elif message.tags == 'info' %}info{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{% static 'core/assets/vendors/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    {% include 'partial/jsshop.html' %}
 </body>
 </html>

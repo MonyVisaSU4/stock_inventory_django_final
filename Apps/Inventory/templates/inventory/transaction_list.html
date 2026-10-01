@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Transaction Audit Log - Inventory Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h1 class="h4 fw-bold mb-1">Stock Transaction Audit Log</h1>
+        <p class="text-body-secondary mb-0">Immutable ledger of all stock additions, sales, and damage deductions.</p>
+    </div>
+
+    <!-- Filter by SKU -->
+    <form method="GET" action="{% url 'inventory:transaction_list' %}" class="d-flex align-items-center gap-2">
+        <input type="text" name="sku" value="{{ product_sku }}" class="form-control form-control-sm w-auto"
+               placeholder="Filter by SKU...">
+        <button type="submit" class="btn btn-dark btn-sm">Filter</button>
+        {% if product_sku %}
+            <a href="{% url 'inventory:transaction_list' %}" class="link-secondary small">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Ledger Table -->
+<div class="card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Product</th>
+                    <th>Action</th>
+                    <th class="text-center">Delta</th>
+                    <th class="text-center">Stock Progression</th>
+                    <th>Operator</th>
+                    <th>Rationale / Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in page_obj %}
+                <tr>
+                    <td class="small text-body-secondary text-nowrap">{{ tx.created_at|date:"Y-m-d H:i:s" }}</td>
+
+                    <td>
+                        <div class="fw-semibold">{{ tx.product.name }}</div>
+                        <div class="font-monospace small text-body-secondary">{{ tx.product.sku }}</div>
+                    </td>
+
+                    <td>
+                        {% if tx.transaction_type == 'RESTOCK' %}
+                            <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">RESTOCK</span>
+                        {% elif tx.transaction_type == 'SALE' %}
+                            <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">SALE</span>
+                        {% elif tx.transaction_type == 'DAMAGE' %}
+                            <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">DAMAGE</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">{{ tx.transaction_type }}</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Signed delta: + in green, - in red -->
+                    <td class="text-center fs-6 fw-bold {% if tx.quantity_delta > 0 %}text-success{% else %}text-danger{% endif %}">
+                        {% if tx.quantity_delta > 0 %}+{{ tx.quantity_delta }}{% else %}{{ tx.quantity_delta }}{% endif %}
+                    </td>
+
+                    <!-- Stock progression (before -> after) -->
+                    <td class="text-center small">
+                        <span class="text-body-secondary">{{ tx.previous_stock }}</span>
+                        <span class="text-body-tertiary mx-1">&rarr;</span>
+                        <strong>{{ tx.new_stock }}</strong>
+                    </td>
+
+                    <td class="small">
+                        {% if tx.user %}
+                            👤 {{ tx.user.username }}
+                        {% else %}
+                            <span class="text-body-tertiary">System / Staff</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="small text-body-secondary">{{ tx.reason }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-body-secondary py-5">
+                        No transactions recorded in the audit log yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer bg-body-tertiary d-flex justify-content-between align-items-center">
+        <span class="small text-body-secondary">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <div class="btn-group btn-group-sm">
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}{% if product_sku %}&sku={{ product_sku }}{% endif %}">Previous</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}{% if product_sku %}&sku={{ product_sku }}{% endif %}">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
