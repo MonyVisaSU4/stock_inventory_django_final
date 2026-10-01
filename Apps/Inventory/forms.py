@@ -1,5 +1,5 @@
 from django import forms
-from .models import StockTransaction, Product
+from .models import StockTransaction
 
 
 class StockAdjustmentForm(forms.Form):
@@ -29,18 +29,3 @@ class StockAdjustmentForm(forms.Form):
         if qty is None or qty <= 0:
             raise forms.ValidationError("Quantity must be a positive integer greater than zero.")
         return qty
-
-
-class ProductForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = ['sku', 'name', 'category', 'price', 'description', 'quantity', 'low_stock_threshold']
-        widgets = {
-            'sku': forms.TextInput(attrs={'class': 'form-control'}),
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
-            'low_stock_threshold': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
