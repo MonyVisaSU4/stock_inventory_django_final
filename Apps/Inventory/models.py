@@ -1,8 +1,6 @@
 from django.db import models
 from django.urls import reverse
 from decimal import Decimal
-from Apps.Category.models import Category
-from Apps.Product.models import Product
 from django.core.validators import MinValueValidator
 from Apps.UserManagement.models import User
 
