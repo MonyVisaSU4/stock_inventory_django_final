@@ -1,0 +1,90 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Adjust Stock - {{ product.sku }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+
+    <div style="margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+        <a href="{% url 'inventory:product_list' %}" style="color: #64748b; font-size: 13px; text-decoration: none; font-weight: 500;">
+            &larr; Back to Catalog
+        </a>
+        <h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin: 8px 0 4px 0;">
+            Adjust Stock Level
+        </h1>
+        <p style="font-size: 14px; color: #64748b; margin: 0;">
+            Recording stock movement for <strong style="color: #0f172a;">{{ product.name }}</strong> (<span style="font-family: monospace;">{{ product.sku }}</span>)
+        </p>
+    </div>
+
+    <!-- On-hand Stock Banner with dynamic low-stock alert coloring -->
+    <div style="background-color: {% if product.is_low_stock %}#fef2f2{% else %}#f8fafc{% endif %}; border: 1px solid {% if product.is_low_stock %}#fecaca{% else %}#e2e8f0{% endif %}; border-radius: 8px; padding: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #64748b;">Current Physical Stock</div>
+            <div style="font-size: 24px; font-weight: 800; color: {% if product.is_low_stock %}#dc2626{% else %}#0f172a{% endif %};">
+                {{ product.quantity }} units
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #64748b;">Low Stock Alert Level</div>
+            <div style="font-size: 14px; font-weight: 700; color: #475569;">{{ product.low_stock_threshold }} units</div>
+        </div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Transaction Type Field -->
+        <div style="margin-bottom: 18px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                Transaction Type
+            </label>
+            {{ form.transaction_type }}
+            {% if form.transaction_type.errors %}
+                <div style="color: #dc2626; font-size: 12px; margin-top: 4px;">{{ form.transaction_type.errors }}</div>
+            {% endif %}
+            <span style="font-size: 12px; color: #64748b; margin-top: 4px; display: block;">
+                Restock/Return adds to stock; Sale/Damage subtracts from stock.
+            </span>
+        </div>
+
+        <!-- Quantity Field -->
+        <div style="margin-bottom: 18px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                Quantity (Units to Add or Subtract)
+            </label>
+            {{ form.quantity }}
+            {% if form.quantity.errors %}
+                <div style="color: #dc2626; font-size: 12px; margin-top: 4px;">{{ form.quantity.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Reason Field -->
+        <div style="margin-bottom: 24px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                Audit Rationale / Reference Note
+            </label>
+            {{ form.reason }}
+            {% if form.reason.errors %}
+                <div style="color: #dc2626; font-size: 12px; margin-top: 4px;">{{ form.reason.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <a
+                href="{% url 'inventory:product_list' %}"
+                style="padding: 10px 18px; font-size: 14px; font-weight: 600; color: #475569; background-color: #f1f5f9; border-radius: 6px; text-decoration: none; display: inline-block;"
+            >
+                Cancel
+            </a>
+            <button
+                type="submit"
+                style="padding: 10px 22px; font-size: 14px; font-weight: 600; color: #ffffff; background-color: #0f172a; border: none; border-radius: 6px; cursor: pointer;"
+            >
+                Confirm & Record Transaction
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

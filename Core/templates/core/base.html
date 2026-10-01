@@ -1,63 +1,60 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
-
+    <title>{% block title %}Inventory Management System{% endblock %}</title>
     {% include "partial/styleshop.html" %}
-    {% block extra_css %}{% endblock %}
-
-    <style>
-        .kantumruy-regular {
-            font-family: "Kantumruy Pro", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 500;
-            font-style: normal;
-        }
-
-    </style>
 </head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; line-height: 1.5;">
 
-<body class="with-welcome-text">
-<div class="container-scroller">
-    <!-- partial:partials/_navbar.html -->
-    {% include 'core/navbar.html' %}
-    <!-- partial -->
-
-    <div class="container-fluid page-body-wrapper">
-        <!-- partial:partials/_sidebar.html -->
-        {% include 'core/sidebar.html' %}
-        <!-- partial -->
-
-        <div class="main-panel">
-            <div class="content-wrapper">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
-                             role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-                {% block content %}{% endblock %}
+    <!-- Top Navigation Bar (Strict Inline CSS) -->
+    <header style="background-color: #0f172a; padding: 0 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; height: 64px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 32px; height: 32px; background-color: #2563eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 800; font-size: 15px; letter-spacing: -0.05em;">
+                IM
             </div>
-            <!-- content-wrapper ends -->
-
-            <!-- partial:partials/_footer.html -->
-            {% include 'core/footer.html' %}
-            <!-- partial -->
+            <a href="{% url 'inventory:product_list' %}" style="color: #ffffff; font-size: 17px; font-weight: 700; text-decoration: none; letter-spacing: -0.02em;">
+                Inventory Management System
+            </a>
         </div>
-        <!-- main-panel ends -->
-    </div>
-    <!-- page-body-wrapper ends -->
-</div>
-<!-- container-scroller -->
-{% include "partial/jsshop.html" %}
-<!-- End custom js for this page-->
-{% block extra_js %}{% endblock %}
+        <nav style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'core:dashboard' %}" style="color: #cbd5e1; font-size: 14px; font-weight: 500; text-decoration: none; padding: 6px 12px;">
+                Dashboard
+            </a>
+            <a href="{% url 'inventory:product_list' %}" style="color: #e2e8f0; font-size: 14px; font-weight: 500; text-decoration: none; padding: 6px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.08);">
+                Product Catalog
+            </a>
+            <a href="{% url 'inventory:transaction_list' %}" style="color: #cbd5e1; font-size: 14px; font-weight: 500; text-decoration: none; padding: 6px 12px;">
+                Transaction Audit Log
+            </a>
+            <a href="/admin/" style="color: #94a3b8; font-size: 14px; text-decoration: none; padding: 6px 12px;">
+                Django Admin
+            </a>
+            {% if user.is_authenticated %}
+                <span style="color: #38bdf8; font-size: 13px; font-weight: 500; background-color: rgba(56,189,248,0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(56,189,248,0.2);">
+                    👤 {{ user.username }}
+                </span>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main style="max-width: 1200px; margin: 32px auto; padding: 0 24px; box-sizing: border-box;">
+
+        <!-- Django Feedback Messages -->
+        {% if messages %}
+            <div style="margin-bottom: 24px;">
+                {% for message in messages %}
+                    <div style="padding: 14px 18px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; {% if message.tags == 'error' %}background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca;{% else %}background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;{% endif %}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
 </body>
 </html>
