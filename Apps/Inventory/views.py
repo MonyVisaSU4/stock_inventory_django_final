@@ -8,7 +8,7 @@ from .services import InventoryService
 from decimal import Decimal, InvalidOperation
 
 
-@role_required('ADMIN', 'MANAGER', 'CASHIER')
+@role_required('ADMIN', 'STAFF')
 def dashboard_view(request):
     total_products = Product.objects.count()
     total_locations = Location.objects.count()
@@ -46,7 +46,7 @@ def dashboard_view(request):
     return render(request, 'inventory/dashboard.html', context)
 
 
-@role_required('ADMIN', 'MANAGER', 'CASHIER')
+@role_required('ADMIN', 'STAFF')
 def product_list_view(request):
     query = request.GET.get('q', '').strip()
     products = Product.objects.prefetch_related('stocks__location', 'supplier').all()
@@ -61,7 +61,7 @@ def product_list_view(request):
     return render(request, 'inventory/product_list.html', context)
 
 
-@role_required('ADMIN', 'MANAGER')
+@role_required('ADMIN', 'STAFF')
 def stock_transfer_view(request):
     products = Product.objects.all()
     locations = Location.objects.all()
@@ -104,7 +104,7 @@ def stock_transfer_view(request):
     return render(request, 'inventory/stock_transfer.html', context)
 
 
-@role_required('ADMIN', 'MANAGER', 'CASHIER')
+@role_required('ADMIN', 'STAFF')
 def stock_checkout_view(request):
     products = Product.objects.all()
     locations = Location.objects.filter(location_type='STORE')
@@ -145,7 +145,7 @@ def stock_checkout_view(request):
     return render(request, 'inventory/stock_checkout.html', context)
 
 
-@role_required('ADMIN', 'MANAGER')
+@role_required('ADMIN', 'STAFF')
 def stock_intake_view(request):
     products = Product.objects.all()
     locations = Location.objects.all()
@@ -186,7 +186,7 @@ def stock_intake_view(request):
     return render(request, 'inventory/stock_intake.html', context)
 
 
-@role_required('ADMIN', 'MANAGER')
+@role_required('ADMIN', 'STAFF')
 def inventory_logs_view(request):
     log_type = request.GET.get('type')
     logs = InventoryLog.objects.select_related(
@@ -204,7 +204,7 @@ def inventory_logs_view(request):
     return render(request, 'inventory/logs.html', context)
 
 
-@role_required('ADMIN', 'MANAGER')
+@role_required('ADMIN')
 def product_add_view(request):
     suppliers = Supplier.objects.all().order_by('name')
 
@@ -284,7 +284,7 @@ def product_add_view(request):
     return render(request, 'inventory/product_add.html', context)
 
 
-@role_required('ADMIN', 'MANAGER')
+@role_required('ADMIN')
 def product_edit_view(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     suppliers = Supplier.objects.all().order_by('name')
@@ -367,7 +367,7 @@ def product_edit_view(request, product_id):
     return render(request, 'inventory/product_edit.html', context)
 
 
-@role_required('ADMIN', 'MANAGER')
+@role_required('ADMIN')
 def product_delete_view(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
 

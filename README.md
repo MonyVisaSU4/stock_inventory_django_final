@@ -28,10 +28,9 @@
   - **Manual Adjustments**: Perform manual stock reconciliation and corrections.
 - **Audit Logging & History**: Automated logging of all stock adjustments, transfers, sales, and intakes with timestamps and reasons.
 - **Low Stock Alerts**: Configurable stock alert thresholds per SKU to prevent stockouts.
-- **Role-Based Access Control (RBAC)**: Custom user authentication with roles:
-  - **IT Administrator (`ADMIN`)** — Full system & user administration.
-  - **Warehouse Manager (`MANAGER`)** — Stock intake, inter-warehouse transfers, and catalog management.
-  - **Store Cashier (`CASHIER`)** — Retail checkouts and local stock monitoring.
+- **Role-Based Access Control (RBAC)**: Custom user authentication with 2 roles:
+  - **Administrator (`ADMIN`)** — Full system administration, catalog CRUD (Add/Edit/Delete products), and all stock operations.
+  - **Inventory Staff (`STAFF`)** — Day-to-day warehouse & retail operations: stock intake, atomic inter-location transfers, point-of-sale checkouts, product catalog viewing, and audit logs.
 - **Automated Data Seeding**: Built-in CLI command to populate realistic sample data (users, suppliers, locations, products, and initial stocks).
 
 ---
@@ -135,9 +134,8 @@ After running `python manage.py seed_data`, the following test accounts are read
 
 | Role | Username | Password | Scope |
 | :--- | :--- | :--- | :--- |
-| **IT Administrator** | `admin` | `password123` | Full admin & superuser access (`/admin/`) |
-| **Warehouse Manager** | `manager` | `password123` | Inventory intake, stock transfers, logs |
-| **Store Cashier** | `cashier` | `password123` | Point-of-sale checkouts, product list |
+| **Administrator** | `admin` | `password123` | Full admin, catalog management (Add/Edit/Delete products), stock operations & Django Admin (`/admin/`) |
+| **Inventory Staff** | `staff` | `password123` | Stock intake, inter-location transfers, POS retail checkouts, catalog viewing & audit logs |
 
 ---
 

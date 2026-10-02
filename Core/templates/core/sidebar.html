@@ -28,7 +28,6 @@
             </a>
         </li>
 
-        {% if request.user.role == 'ADMIN' or request.user.role == 'MANAGER' or request.user.is_superuser %}
         <!-- Stock Transfer Engine -->
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'transfer' %}active{% endif %}" href="{% url 'inventory:transfer' %}">
@@ -52,6 +51,5 @@
                 <span class="menu-title">Audit Logs</span>
             </a>
         </li>
-        {% endif %}
     </ul>
 </nav>

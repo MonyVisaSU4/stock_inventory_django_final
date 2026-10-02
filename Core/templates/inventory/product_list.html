@@ -21,7 +21,7 @@
                             <a href="{% url 'inventory:product-list' %}" class="btn btn-sm btn-outline-secondary ms-1">Clear</a>
                             {% endif %}
                         </form>
-                        {% if request.user.role == 'ADMIN' or request.user.role == 'MANAGER' or request.user.is_superuser %}
+                        {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
                         <a href="{% url 'inventory:product-add' %}" class="btn btn-sm btn-success text-white">
                             <i class="mdi mdi-plus me-1"></i> Add Product
                         </a>
@@ -39,7 +39,7 @@
                                 <th>Unit Prices (Cost / Retail)</th>
                                 <th>Total Stock</th>
                                 <th>Stock By Location Node</th>
-                                {% if request.user.role == 'ADMIN' or request.user.role == 'MANAGER' or request.user.is_superuser %}
+                                {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
                                 <th class="text-center">Actions</th>
                                 {% endif %}
                             </tr>
@@ -90,7 +90,7 @@
                                         {% endfor %}
                                     </div>
                                 </td>
-                                {% if request.user.role == 'ADMIN' or request.user.role == 'MANAGER' or request.user.is_superuser %}
+                                {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1">
                                         <a href="{% url 'inventory:product-edit' product.id %}"
@@ -107,7 +107,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="{% if request.user.role == 'ADMIN' or request.user.role == 'MANAGER' or request.user.is_superuser %}7{% else %}6{% endif %}" class="text-center py-5 text-muted">
+                                <td colspan="{% if request.user.role == 'ADMIN' or request.user.is_superuser %}7{% else %}6{% endif %}" class="text-center py-5 text-muted">
                                     <i class="mdi mdi-package-variant-closed-remove fs-1 text-secondary d-block mb-2"></i>
                                     No products found matching the criteria.
                                 </td>

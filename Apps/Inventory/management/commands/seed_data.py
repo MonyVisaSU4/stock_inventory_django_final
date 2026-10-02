@@ -9,11 +9,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write("Starting database seed...")
 
-        # 1. Users
+        # 1. Users (2 Roles: Administrator & Inventory Staff)
         users_data = [
             {'username': 'admin', 'email': 'admin@invenstock.com', 'role': 'ADMIN', 'is_staff': True, 'is_superuser': True},
-            {'username': 'manager', 'email': 'manager@invenstock.com', 'role': 'MANAGER', 'is_staff': False, 'is_superuser': False},
-            {'username': 'cashier', 'email': 'cashier@invenstock.com', 'role': 'CASHIER', 'is_staff': False, 'is_superuser': False},
+            {'username': 'staff', 'email': 'staff@invenstock.com', 'role': 'STAFF', 'is_staff': False, 'is_superuser': False},
         ]
 
         for u in users_data:
@@ -35,6 +34,9 @@ class Command(BaseCommand):
             user.save()
             action = "Created" if created else "Updated"
             self.stdout.write(f" - {action} user: {user.username} ({user.role}) [Password: password123]")
+
+        # Clean up obsolete legacy users if present
+        User.objects.filter(username__in=['manager', 'cashier']).delete()
 
         # 2. Suppliers
         suppliers_data = [
