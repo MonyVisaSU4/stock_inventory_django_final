@@ -1,13 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+import datetime
 
+
+@login_required
 def dashboard(request):
-    role = 'Admin'
-    title = 'Good Morning'
-    desc = 'Your performance summary this week'
-
     context = {
-        'role': role,
-        'title': title,
-        'desc': desc
+
     }
     return render(request, 'core/dashboard.html', context)

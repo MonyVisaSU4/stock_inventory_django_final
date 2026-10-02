@@ -5,10 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
-
     {% include "partial/styleshop.html" %}
-    {% block extra_css %}{% endblock %}
-
     <style>
         .kantumruy-regular {
             font-family: "Kantumruy Pro", sans-serif;
@@ -19,12 +16,8 @@
 
     </style>
 </head>
-
-<body class="with-welcome-text pt-lg-5">
+<body class="with-welcome-text">
     {% block content %}{% endblock %}
-    <!-- container-scroller -->
     {% include "partial/jsshop.html" %}
-    <!-- End custom js for this page-->
-    {% block extra_js %}{% endblock %}
 </body>
 </html>
