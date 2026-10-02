@@ -1,0 +1,75 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Store Checkout (POS) | Stock Inventory{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 grid-margin stretch-card">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="p-3 bg-success-subtle text-success rounded-3 me-3" style="background-color: #e6f4ea;">
+                        <i class="mdi mdi-cart-arrow-right fs-2 text-success"></i>
+                    </div>
+                    <div>
+                        <h4 class="card-title mb-1 fw-bold">Store Checkout Terminal (POS)</h4>
+                        <p class="text-muted mb-0 small">Process customer purchases directly at retail storefront nodes with real-time stock deduction.</p>
+                    </div>
+                </div>
+
+                <form method="POST" action="{% url 'inventory:checkout' %}" class="forms-sample">
+                    {% csrf_token %}
+
+                    <!-- Store Selection -->
+                    <div class="form-group mb-3">
+                        <label class="fw-semibold text-dark">Select Retail Store Node</label>
+                        <select name="location_id" class="form-select form-control" required>
+                            <option value="">-- Choose Store Location --</option>
+                            {% for loc in locations %}
+                                <option value="{{ loc.id }}">{{ loc.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Stock will be decremented from this retail register.</small>
+                    </div>
+
+                    <!-- Product Selection -->
+                    <div class="form-group mb-3">
+                        <label class="fw-semibold text-dark">Select Product</label>
+                        <select name="product_id" class="form-select form-control" required>
+                            <option value="">-- Choose Product to Sell --</option>
+                            {% for product in products %}
+                                <option value="{{ product.id }}">
+                                    {{ product.sku }} — {{ product.name }} (${{ product.retail_price }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="form-group mb-3">
+                        <label class="fw-semibold text-dark">Quantity Purchased</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="mdi mdi-cart-outline"></i></span>
+                            <input type="number" name="quantity" min="1" value="1" class="form-control" placeholder="1" required>
+                        </div>
+                    </div>
+
+                    <!-- Reason / Reference -->
+                    <div class="form-group mb-4">
+                        <label class="fw-semibold text-dark">Invoice / POS Receipt Note (Optional)</label>
+                        <input type="text" name="reason" class="form-control" placeholder="e.g., POS Receipt #INV-2026-081">
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'inventory:dashboard' %}" class="btn btn-light">Back to Dashboard</a>
+                        <button type="submit" class="btn btn-success text-white px-4">
+                            <i class="mdi mdi-check-all me-1"></i> Complete Checkout & Record Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

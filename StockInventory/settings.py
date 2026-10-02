@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-nmr1(pdwb(75@#ve7o5-c7i9%+bc#8u=(btv%g&p-3bd1@pvyd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,11 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'Core',
+    'Apps.Auth',
     'Apps.Inventory',
-    'Apps.UserManagement',
 ]
 
-AUTH_USER_MODEL = 'UserManagement.User'
+AUTH_USER_MODEL = 'Auth.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -131,7 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'Core' / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'Core' / 'static' / 'core']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = 'media/'

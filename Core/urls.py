@@ -1,12 +1,9 @@
 from django.urls import path
-
 from Core import views as core_views
-
-from Apps.UserManagement import views
+from Apps.Auth import views as auth_views
 
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.CustomLoginView, name='login'),
-    path('/dashboard', core_views.dashboard, name='dashboard'),
+    path('dashboard/', core_views.dashboard, name='dashboard'),
 ]

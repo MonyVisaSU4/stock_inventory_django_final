@@ -1,0 +1,68 @@
+{% extends "core/base-auth.html" %}
+{% load static %}
+
+{% block title %}Sign In | Stock Inventory{% endblock %}
+
+{% block content %}
+<div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+        <div class="content-wrapper d-flex align-items-center auth px-0">
+            <div class="row w-100 mx-0 justify-content-center">
+                <div class="col-lg-4 col-md-6 col-sm-8 mx-auto">
+                    <div class="auth-form-light text-start py-5 px-4 px-sm-5 shadow rounded-4 bg-white">
+                        <div class="brand-logo text-center mb-4">
+                            <h2 class="fw-bold text-primary mb-1">
+                                <i class="mdi mdi-warehouse"></i> InvenStock
+                            </h2>
+                            <p class="text-muted small">Multi-Location Inventory Management Platform</p>
+                        </div>
+
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags|default:'danger' }} alert-dismissible fade show small" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <h4 class="fw-bold text-dark mb-1">Welcome Back!</h4>
+                        <h6 class="fw-light text-muted mb-4">Sign in to continue to your dashboard.</h6>
+
+                        <form class="pt-2" method="POST" action="{% url 'auth:login' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.GET.next }}">
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label small fw-semibold text-muted">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="mdi mdi-account-outline text-primary"></i></span>
+                                    <input type="text" name="username" class="form-control form-control-lg" placeholder="Enter username" required autofocus>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label small fw-semibold text-muted">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="mdi mdi-lock-outline text-primary"></i></span>
+                                    <input type="password" name="password" class="form-control form-control-lg" placeholder="Enter password" required>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn w-100 text-white shadow-sm">
+                                    <i class="mdi mdi-login me-1"></i> Sign In
+                                </button>
+                            </div>
+
+                            <div class="my-3 text-center">
+                                <small class="text-muted">Role-Based Access: Admin, Manager, Cashier</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

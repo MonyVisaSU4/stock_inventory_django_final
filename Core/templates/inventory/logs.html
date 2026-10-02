@@ -1,0 +1,101 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Audit Telemetry Logs | Stock Inventory{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h4 class="card-title mb-1 fw-bold">Audit Telemetry & Transaction Logs</h4>
+                        <p class="card-description text-muted mb-0">Immutable historical trail of all intakes, sales checkouts, transfers, and inventory adjustments.</p>
+                    </div>
+                    <!-- Filter Buttons -->
+                    <div class="btn-group">
+                        <a href="{% url 'inventory:logs' %}" class="btn btn-sm {% if not selected_type %}btn-primary text-white{% else %}btn-outline-secondary{% endif %}">All</a>
+                        {% for type_code, type_name in log_types %}
+                            <a href="{% url 'inventory:logs' %}?type={{ type_code }}" class="btn btn-sm {% if selected_type == type_code %}btn-primary text-white{% else %}btn-outline-secondary{% endif %}">
+                                {{ type_name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Type</th>
+                                <th>SKU & Product</th>
+                                <th>Quantity Impact</th>
+                                <th>Routing Source & Destination</th>
+                                <th>Reason / Note</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td><span class="text-muted small">#{{ log.id }}</span></td>
+                                <td>
+                                    {% if log.log_type == 'STOCK_IN' %}
+                                        <span class="badge bg-success">STOCK IN (Intake)</span>
+                                    {% elif log.log_type == 'STOCK_OUT' %}
+                                        <span class="badge bg-danger">STOCK OUT (Sale)</span>
+                                    {% elif log.log_type == 'TRANSFER' %}
+                                        <span class="badge bg-primary">TRANSFER (Relocate)</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">ADJUSTMENT</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark">{{ log.product.name }}</span><br>
+                                    <small class="badge bg-secondary font-monospace">{{ log.product.sku }}</small>
+                                </td>
+                                <td>
+                                    <span class="fs-6 fw-bold {% if log.quantity_changed > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {% if log.quantity_changed > 0 %}+{% endif %}{{ log.quantity_changed }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if log.source_location and log.destination_location %}
+                                        <div class="small">
+                                            <span class="text-danger fw-semibold">{{ log.source_location.name }}</span>
+                                            <i class="mdi mdi-arrow-right-bold text-muted mx-1"></i>
+                                            <span class="text-success fw-semibold">{{ log.destination_location.name }}</span>
+                                        </div>
+                                    {% elif log.source_location %}
+                                        <div class="small text-muted">Origin: <strong class="text-dark">{{ log.source_location.name }}</strong></div>
+                                    {% elif log.destination_location %}
+                                        <div class="small text-muted">Destination: <strong class="text-dark">{{ log.destination_location.name }}</strong></div>
+                                    {% else %}
+                                        <span class="text-muted small">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="text-dark small">{{ log.reason|default:"No notes attached" }}</span>
+                                </td>
+                                <td>
+                                    <span class="small text-muted">{{ log.created_at|date:"Y-m-d H:i:s" }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="mdi mdi-clipboard-text-clock fs-1 text-secondary d-block mb-2"></i>
+                                    No transaction logs found for this filter.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

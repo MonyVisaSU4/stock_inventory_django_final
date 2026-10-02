@@ -1,56 +1,43 @@
 from django.contrib import admin
-from .models import Category, Product, StockTransaction
+from .models import Supplier, Location, Product, ProductLocation, InventoryLog
 
-# Register your models here.
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_at')
+
+class ProductLocationInline(admin.TabularInline):
+    model = ProductLocation
+    extra = 1
+
+
+@admin.register(Supplier)
+class SupplierAdmin(admin.ModelAdmin):
+    list_display = ('name', 'contact_email', 'contact_phone')
+    search_fields = ('name', 'contact_email')
+
+
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'location_type')
+    list_filter = ('location_type',)
     search_fields = ('name',)
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = (
-        'sku',
-        'name',
-        'category',
-        'price',
-        'quantity',
-        'low_stock_threshold',
-        'is_low_stock'
-    )
-    list_filter = ('category',)
+    list_display = ('sku', 'name', 'retail_price', 'cost_price', 'supplier', 'low_stock_alert')
     search_fields = ('sku', 'name')
-    readonly_fields = ('created_at', 'updated_at')
+    list_filter = ('supplier',)
+    inlines = [ProductLocationInline]
 
 
-@admin.register(StockTransaction)
-class StockTransactionAdmin(admin.ModelAdmin):
-    list_display = (
-        'created_at',
-        'product',
-        'transaction_type',
-        'quantity_delta',
-        'previous_stock',
-        'new_stock',
-        'user'
-    )
-    list_filter = ('transaction_type', 'created_at')
-    search_fields = ('product__sku', 'product__name', 'reason', 'user__username')
-    readonly_fields = (
-        'product',
-        'user',
-        'transaction_type',
-        'quantity_delta',
-        'previous_stock',
-        'new_stock',
-        'reason',
-        'created_at'
-    )
+@admin.register(ProductLocation)
+class ProductLocationAdmin(admin.ModelAdmin):
+    list_display = ('product', 'location', 'quantity')
+    list_filter = ('location',)
+    search_fields = ('product__name', 'product__sku', 'location__name')
 
-    def has_add_permission(self, request):
-        # Stock transactions are immutable audit logs created via stock operations
-        return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+@admin.register(InventoryLog)
+class InventoryLogAdmin(admin.ModelAdmin):
+    list_display = ('product', 'log_type', 'quantity_changed', 'source_location', 'destination_location', 'created_at')
+    list_filter = ('log_type', 'created_at')
+    search_fields = ('product__name', 'product__sku', 'reason')
+    readonly_fields = ('created_at',)
