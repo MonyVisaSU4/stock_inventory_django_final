@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from Apps.Auth.decorators import role_required
 from .models import Product, Location, ProductLocation, InventoryLog, Supplier
 from .services import InventoryService
+from decimal import Decimal, InvalidOperation
 
 
 @role_required('ADMIN', 'MANAGER', 'CASHIER')
@@ -201,3 +202,180 @@ def inventory_logs_view(request):
         'log_types': InventoryLog.LOG_TYPES,
     }
     return render(request, 'inventory/logs.html', context)
+
+
+@role_required('ADMIN', 'MANAGER')
+def product_add_view(request):
+    suppliers = Supplier.objects.all().order_by('name')
+
+    if request.method == 'POST':
+        sku = request.POST.get('sku', '').strip()
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        retail_price_str = request.POST.get('retail_price', '0').strip()
+        cost_price_str = request.POST.get('cost_price', '0').strip()
+        supplier_id = request.POST.get('supplier_id', '').strip()
+        low_stock_alert_str = request.POST.get('low_stock_alert', '5').strip()
+
+        errors = []
+        if not sku:
+            errors.append("SKU is required.")
+        elif Product.objects.filter(sku=sku).exists():
+            errors.append(f"A product with SKU '{sku}' already exists.")
+        if not name:
+            errors.append("Product name is required.")
+
+        try:
+            retail_price = Decimal(retail_price_str)
+            if retail_price < 0:
+                errors.append("Retail price cannot be negative.")
+        except InvalidOperation:
+            errors.append("Invalid retail price.")
+            retail_price = Decimal('0.00')
+
+        try:
+            cost_price = Decimal(cost_price_str)
+            if cost_price < 0:
+                errors.append("Cost price cannot be negative.")
+        except InvalidOperation:
+            errors.append("Invalid cost price.")
+            cost_price = Decimal('0.00')
+
+        try:
+            low_stock_alert = int(low_stock_alert_str)
+            if low_stock_alert < 0:
+                errors.append("Low stock alert threshold cannot be negative.")
+        except (ValueError, TypeError):
+            errors.append("Invalid low stock alert value.")
+            low_stock_alert = 5
+
+        supplier = None
+        if supplier_id:
+            try:
+                supplier = Supplier.objects.get(pk=supplier_id)
+            except Supplier.DoesNotExist:
+                errors.append("Selected supplier does not exist.")
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            context = {
+                'suppliers': suppliers,
+                'form_data': request.POST,
+            }
+            return render(request, 'inventory/product_add.html', context)
+
+        product = Product.objects.create(
+            sku=sku,
+            name=name,
+            description=description or None,
+            retail_price=retail_price,
+            cost_price=cost_price,
+            supplier=supplier,
+            low_stock_alert=low_stock_alert,
+        )
+        messages.success(request, f"Product '{product.name}' (SKU: {product.sku}) has been created successfully.")
+        return redirect('inventory:product-list')
+
+    context = {
+        'suppliers': suppliers,
+        'form_data': {},
+    }
+    return render(request, 'inventory/product_add.html', context)
+
+
+@role_required('ADMIN', 'MANAGER')
+def product_edit_view(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    suppliers = Supplier.objects.all().order_by('name')
+
+    if request.method == 'POST':
+        sku = request.POST.get('sku', '').strip()
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        retail_price_str = request.POST.get('retail_price', '0').strip()
+        cost_price_str = request.POST.get('cost_price', '0').strip()
+        supplier_id = request.POST.get('supplier_id', '').strip()
+        low_stock_alert_str = request.POST.get('low_stock_alert', '5').strip()
+
+        errors = []
+        if not sku:
+            errors.append("SKU is required.")
+        elif Product.objects.filter(sku=sku).exclude(pk=product_id).exists():
+            errors.append(f"A product with SKU '{sku}' already exists.")
+        if not name:
+            errors.append("Product name is required.")
+
+        try:
+            retail_price = Decimal(retail_price_str)
+            if retail_price < 0:
+                errors.append("Retail price cannot be negative.")
+        except InvalidOperation:
+            errors.append("Invalid retail price.")
+            retail_price = product.retail_price
+
+        try:
+            cost_price = Decimal(cost_price_str)
+            if cost_price < 0:
+                errors.append("Cost price cannot be negative.")
+        except InvalidOperation:
+            errors.append("Invalid cost price.")
+            cost_price = product.cost_price
+
+        try:
+            low_stock_alert = int(low_stock_alert_str)
+            if low_stock_alert < 0:
+                errors.append("Low stock alert threshold cannot be negative.")
+        except (ValueError, TypeError):
+            errors.append("Invalid low stock alert value.")
+            low_stock_alert = product.low_stock_alert
+
+        supplier = None
+        if supplier_id:
+            try:
+                supplier = Supplier.objects.get(pk=supplier_id)
+            except Supplier.DoesNotExist:
+                errors.append("Selected supplier does not exist.")
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            context = {
+                'product': product,
+                'suppliers': suppliers,
+                'form_data': request.POST,
+            }
+            return render(request, 'inventory/product_edit.html', context)
+
+        product.sku = sku
+        product.name = name
+        product.description = description or None
+        product.retail_price = retail_price
+        product.cost_price = cost_price
+        product.supplier = supplier
+        product.low_stock_alert = low_stock_alert
+        product.save()
+
+        messages.success(request, f"Product '{product.name}' has been updated successfully.")
+        return redirect('inventory:product-list')
+
+    context = {
+        'product': product,
+        'suppliers': suppliers,
+        'form_data': {},
+    }
+    return render(request, 'inventory/product_edit.html', context)
+
+
+@role_required('ADMIN', 'MANAGER')
+def product_delete_view(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+
+    if request.method == 'POST':
+        product_name = product.name
+        product.delete()
+        messages.success(request, f"Product '{product_name}' has been deleted.")
+        return redirect('inventory:product-list')
+
+    context = {'product': product}
+    return render(request, 'inventory/product_confirm_delete.html', context)
