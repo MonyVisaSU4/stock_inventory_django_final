@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+
+    {% include "partial/styleshop.html" %}
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        .kantumruy-regular {
+            font-family: "Kantumruy Pro", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+    </style>
+</head>
+
+<body class="with-welcome-text pt-lg-5">
+    {% block content %}{% endblock %}
+    <!-- container-scroller -->
+    {% include "partial/jsshop.html" %}
+    <!-- End custom js for this page-->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
