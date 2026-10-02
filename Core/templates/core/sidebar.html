@@ -53,15 +53,5 @@
             </a>
         </li>
         {% endif %}
-
-        {% if request.user.is_superuser or request.user.role == 'ADMIN' %}
-        <li class="nav-item nav-category">Administration</li>
-        <li class="nav-item">
-            <a class="nav-link" href="/admin/" target="_blank">
-                <i class="menu-icon mdi mdi-shield-account"></i>
-                <span class="menu-title">Django Admin</span>
-            </a>
-        </li>
-        {% endif %}
     </ul>
 </nav>
