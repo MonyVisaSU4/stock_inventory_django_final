@@ -45,3 +45,12 @@ class User(AbstractUser):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
+
+    def is_admin(self):
+        return self.role == self.Role.ADMIN
+
+    def is_staff_user(self):
+        return self.role == self.Role.STAFF
+
+    def is_active_user(self):
+        return self.status == self.Status.ACTIVE

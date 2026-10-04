@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'StockInventory.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME', default='stock_inventory_django'),
+        'NAME': config('DB_NAME', default='stock_inventory_db'),
         'USER': config('DB_USER', default='visa'),
         'PASSWORD': config('DB_PASSWORD', default='123'),
         'HOST': config('DB_HOST', default='localhost'),
@@ -124,6 +124,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+LOGIN_URL = "auth:login"
 
 
 # Static files (CSS, JavaScript, Images)

@@ -1,5 +1,6 @@
-{% extends 'core/base-auth.html' %} {% block title %}Register | {{ SITE_NAME
-}}{% endblock %} {% block content %}
+{% extends 'core/base-auth.html' %}
+{% block title %}Register | {{ SITE_NAME }} {% endblock %}
+{% block content %}
 <div class="row justify-content-center">
   <div class="col-md-6">
     <div class="card shadow-sm">
@@ -8,7 +9,17 @@
           <i class="bi bi-person-plus"></i> Create Account
         </h3>
 
-        <form method="post">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-circle"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+          {% csrf_token %}
           <!-- First Name & Last Name -->
           <div class="row">
             <div class="col-md-6 mb-3">
