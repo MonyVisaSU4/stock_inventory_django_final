@@ -1,0 +1,87 @@
+{% extends 'core/base-auth.html' %} 
+{% block title %}Done | {{ SITE_NAME }}{% endblock %} 
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-5 text-center">
+
+                {% if status == "success" %}
+
+                    <!-- Success -->
+                    <div class="mb-4">
+                        <div class="success-icon">
+                            <i class="mdi mdi-check-circle text-success"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="fw-bold text-success mb-2">
+                        OTP Verified!
+                    </h3>
+
+                    <p class="text-muted mb-4">
+                        Your OTP has been verified successfully.
+                        You can now continue to reset your password.
+                    </p>
+
+                    <a href="#"
+                       class="btn btn-success w-100">
+                        Continue
+                    </a>
+
+                {% else %}
+
+                    <!-- Denied -->
+                    <div class="mb-4">
+                        <div class="denied-icon">
+                            <i class="mdi mdi-block-helper text-danger"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="fw-bold text-danger mb-2">
+                        Verification Failed
+                    </h3>
+
+                    <p class="text-muted mb-4">
+                        The OTP you entered is incorrect or has expired.
+                        Please try again.
+                    </p>
+
+                    <a href="{% url 'auth:verify-email' %}"
+                       class="btn btn-danger w-100">
+                        Try Again
+                    </a>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .success-icon,
+    .denied-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 40px;
+    }
+
+    .success-icon {
+        background-color: #d1e7dd;
+        color: #198754;
+    }
+
+    .denied-icon {
+        background-color: #f8d7da;
+        color: #dc3545;
+    }
+</style>
+{% endblock %}

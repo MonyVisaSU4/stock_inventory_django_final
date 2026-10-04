@@ -1,0 +1,218 @@
+{% extends 'core/base-auth.html' %} 
+{% block title %}Verify OTP | {{ SITE_NAME }}{% endblock %} 
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <i class="bi bi-shield-lock fs-1 text-primary"></i>
+
+                    <h3 class="mt-2 mb-2">
+                        Verify OTP
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Enter the 6-digit code sent to your email.
+                    </p>
+
+                    <small class="text-muted">
+                        example@email.com
+                    </small>
+                </div>
+
+                <form method="post" id="otpForm">
+                    {% csrf_token %}
+
+                    <!-- OTP Inputs -->
+                    <div class="d-flex justify-content-center gap-2 mb-4">
+
+                        <input
+                            type="text"
+                            class="form-control text-center otp-input"
+                            maxlength="1"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            name="otp1"
+                            required
+                        >
+
+                        <input
+                            type="text"
+                            class="form-control text-center otp-input"
+                            maxlength="1"
+                            inputmode="numeric"
+                            name="otp2"
+                            required
+                        >
+
+                        <input
+                            type="text"
+                            class="form-control text-center otp-input"
+                            maxlength="1"
+                            inputmode="numeric"
+                            name="otp3"
+                            required
+                        >
+
+                        <input
+                            type="text"
+                            class="form-control text-center otp-input"
+                            maxlength="1"
+                            inputmode="numeric"
+                            name="otp4"
+                            required
+                        >
+
+                        <input
+                            type="text"
+                            class="form-control text-center otp-input"
+                            maxlength="1"
+                            inputmode="numeric"
+                            name="otp5"
+                            required
+                        >
+
+                        <input
+                            type="text"
+                            class="form-control text-center otp-input"
+                            maxlength="1"
+                            inputmode="numeric"
+                            name="otp6"
+                            required
+                        >
+
+                    </div>
+
+                    <!-- Hidden combined OTP -->
+                    <input type="hidden" name="otp" id="otp">
+
+                    <!-- Verify -->
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                    >
+                        <i class="bi bi-check-circle"></i>
+                        Verify OTP
+                    </button>
+
+                </form>
+
+                <!-- Resend -->
+                <div class="text-center mt-3">
+                    <span class="text-muted">
+                        Didn't receive the code?
+                    </span>
+
+                    <a href="#" class="text-decoration-none">
+                        Resend OTP
+                    </a>
+                </div>
+
+                <!-- Back -->
+                <div class="text-center mt-3">
+                    <a
+                        href="{% url 'auth:verify-email' %}"
+                        class="text-muted text-decoration-none"
+                    >
+                        <i class="bi bi-arrow-left"></i>
+                        Back to Forgot Password
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .otp-input {
+        width: 65px;
+        height: 70px;
+        font-size: 24px;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .otp-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+</style>
+
+<script>
+    const otpInputs = document.querySelectorAll(".otp-input");
+    const otpHidden = document.getElementById("otp");
+
+    otpInputs.forEach((input, index) => {
+
+        // Move to next box after entering a digit
+        input.addEventListener("input", () => {
+
+            input.value = input.value.replace(/\D/g, "");
+
+            if (input.value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+
+            updateOTP();
+        });
+
+        // Move back when pressing Backspace
+        input.addEventListener("keydown", (event) => {
+
+            if (
+                event.key === "Backspace" &&
+                !input.value &&
+                index > 0
+            ) {
+                otpInputs[index - 1].focus();
+            }
+        });
+
+        // Support pasting the entire OTP
+        input.addEventListener("paste", (event) => {
+
+            event.preventDefault();
+
+            const pastedData = event.clipboardData
+                .getData("text")
+                .replace(/\D/g, "")
+                .slice(0, 6);
+
+            pastedData.split("").forEach((digit, i) => {
+                if (otpInputs[i]) {
+                    otpInputs[i].value = digit;
+                }
+            });
+
+            updateOTP();
+
+            const nextIndex = Math.min(
+                pastedData.length,
+                otpInputs.length - 1
+            );
+
+            otpInputs[nextIndex].focus();
+        });
+    });
+
+    // Combine six inputs into one OTP value
+    function updateOTP() {
+        let otp = "";
+
+        otpInputs.forEach(input => {
+            otp += input.value;
+        });
+
+        otpHidden.value = otp;
+    }
+
+    // Make sure OTP is updated before submit
+    document.getElementById("otpForm").addEventListener("submit", () => {
+        updateOTP();
+    });
+</script>
+{% endblock %}

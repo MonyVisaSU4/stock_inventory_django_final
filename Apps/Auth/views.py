@@ -1,32 +1,19 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.contrib import messages
+from django.shortcuts import render
 
+# Create your views here.
+def login(request):
+    return render(request, 'login.html')
 
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('inventory:dashboard')
+def register(request):
+    return render(request, 'register.html')
 
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+def verify_email(request):
+    return render(request, 'verify-email.html')
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            if user.status == 'ACTIVE':
-                auth_login(request, user)
-                messages.success(request, f"Welcome back, {user.username} ({user.get_role_display()})!")
-                next_url = request.GET.get('next') or request.POST.get('next') or 'inventory:dashboard'
-                return redirect(next_url)
-            else:
-                messages.error(request, "Your account is currently inactive. Contact your administrator.")
-        else:
-            messages.error(request, "Invalid username or password.")
+def otp(request):
+    return render(request, 'otp.html')
 
-    return render(request, 'auth/login.html')
-
-
-def logout_view(request):
-    auth_logout(request)
-    messages.info(request, "You have been safely logged out.")
-    return redirect('auth:login')
+def done_verify(request):
+    return render(request, 'done-verify.html', context={
+        'status': 'success'
+    })

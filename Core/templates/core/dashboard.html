@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard | {{ SITE_NAME }}{% endblock %}
+{% block content %}
+    <div class="row mb-4">
+        <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 text-uppercase fw-semibold small">Catalog Items</p>
+                            <h2 class="fw-bold mb-0 text-dark">{{ total_products }}</h2>
+                        </div>
+                        <div class="icon-box bg-primary-subtle text-primary p-3 rounded-circle"
+                             style="background-color: #e8f0fe; color: #1a73e8;">
+                            <i class="mdi mdi-package-variant-closed fs-3"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted small mt-2 d-block"><i class="mdi mdi-check-circle text-success me-1"></i>Active SKUs</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 text-uppercase fw-semibold small">Total Units In Stock</p>
+                            <h2 class="fw-bold mb-0 text-dark">{{ total_units }}</h2>
+                        </div>
+                        <div class="icon-box p-3 rounded-circle" style="background-color: #e6f4ea; color: #137333;">
+                            <i class="mdi mdi-cube-outline fs-3"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted small mt-2 d-block"><i
+                            class="mdi mdi-map-marker-multiple text-success me-1"></i>Across {{ total_locations }} nodes</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 text-uppercase fw-semibold small">Active Nodes</p>
+                            <h2 class="fw-bold mb-0 text-dark">{{ total_locations }}</h2>
+                        </div>
+                        <div class="icon-box p-3 rounded-circle" style="background-color: #fef7e0; color: #b06000;">
+                            <i class="mdi mdi-warehouse fs-3"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted small mt-2 d-block"><i class="mdi mdi-store text-warning me-1"></i>Warehouses & Retail Stores</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 text-uppercase fw-semibold small">Low Stock Warnings</p>
+                            <h2 class="fw-bold mb-0 {% if low_stock_count > 0 %}text-danger{% else %}text-success{% endif %}">{{ low_stock_count }}</h2>
+                        </div>
+                        <div class="icon-box p-3 rounded-circle" style="background-color: #fce8e6; color: #c5221f;">
+                            <i class="mdi mdi-alert-circle-outline fs-3"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted small mt-2 d-block">
+                                {% if low_stock_count > 0 %}
+                                    <span class="text-danger fw-semibold"><i class="mdi mdi-alert me-1"></i>Requires restock</span>
+                                {% else %}
+                                    <span class="text-success fw-semibold"><i class="mdi mdi-shield-check me-1"></i>All stock healthy</span>
+                                {% endif %}
+                            </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

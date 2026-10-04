@@ -2,54 +2,113 @@
 
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
-        <!-- Dashboard -->
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'inventory:dashboard' %}">
+            <a class="nav-link"
+               href="{% url 'core:dashboard' %}"
+               {% if request.resolver_match.url_name == 'dashboard' %}
+                    style="background-color: white;"
+               {% endif %}
+            >
                 <i class="mdi mdi-grid-large menu-icon"></i>
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
+        <li class="nav-item nav-category">Apps</li>
 
-        <li class="nav-item nav-category">Inventory Management</li>
-
-        <!-- Product Catalog -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'product-list' %}active{% endif %}" href="{% url 'inventory:product-list' %}">
+        {#    Product    #}
+        <li class="nav-item kantumruy-regular">
+            <a class="nav-link {% if request.resolver_match.namespace == 'product' %}active{% endif %}"
+               data-bs-toggle="collapse"
+               href="#ui-product"
+               aria-expanded="{% if request.resolver_match.namespace == 'product' %}true{% else %}false{% endif %}"
+               aria-controls="ui-product">
                 <i class="menu-icon mdi mdi-package-variant-closed"></i>
-                <span class="menu-title">Product Catalog</span>
+                <span class="menu-title">Product</span>
+                <i class="menu-arrow"></i>
             </a>
+            <div class="collapse {% if request.resolver_match.namespace == 'product' %}show{% endif %}"
+                 id="ui-product">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'list' %}active{% endif %}"
+                           href="#">
+                            Product List
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'create' %}active{% endif %}"
+                           href="#">
+                            Add Product
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
 
-        <!-- Store Checkout / POS -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'checkout' %}active{% endif %}" href="{% url 'inventory:checkout' %}">
-                <i class="menu-icon mdi mdi-cart-arrow-right"></i>
-                <span class="menu-title">Store Checkout (POS)</span>
+        {#    User    #}
+        <li class="nav-item kantumruy-regular">
+            <a class="nav-link {% if request.resolver_match.namespace == 'user' %}active{% endif %}"
+               data-bs-toggle="collapse"
+               href="#ui-user"
+               aria-expanded="{% if request.resolver_match.namespace == 'user' %}true{% else %}false{% endif %}"
+               aria-controls="ui-user">
+                <i class="menu-icon mdi mdi-human"></i>
+                <span class="menu-title">User</span>
+                <i class="menu-arrow"></i>
             </a>
+            <div class="collapse {% if request.resolver_match.namespace == 'user' %}show{% endif %}"
+                 id="ui-user">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'list' %}active{% endif %}"
+                           href="#">
+                            User List
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'create' %}active{% endif %}"
+                           href="#">
+                            Add User
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
 
-        <!-- Stock Transfer Engine -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'transfer' %}active{% endif %}" href="{% url 'inventory:transfer' %}">
-                <i class="menu-icon mdi mdi-swap-horizontal-bold"></i>
-                <span class="menu-title">Atomic Transfer</span>
+        {#    Stock Movements    #}
+        <li class="nav-item kantumruy-regular">
+            <a class="nav-link {% if request.resolver_match.namespace == 'stock' %}active{% endif %}"
+               data-bs-toggle="collapse"
+               href="#ui-stock"
+               aria-expanded="{% if request.resolver_match.namespace == 'stock' %}true{% else %}false{% endif %}"
+               aria-controls="ui-stock">
+                <i class="menu-icon mdi mdi-warehouse"></i>
+                <span class="menu-title">Stock Movements</span>
+                <i class="menu-arrow"></i>
             </a>
-        </li>
-
-        <!-- Stock Intake -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'intake' %}active{% endif %}" href="{% url 'inventory:intake' %}">
-                <i class="menu-icon mdi mdi-arrow-down-bold-box"></i>
-                <span class="menu-title">Stock Intake</span>
-            </a>
-        </li>
-
-        <!-- Audit Telemetry Logs -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'logs' %}active{% endif %}" href="{% url 'inventory:logs' %}">
-                <i class="menu-icon mdi mdi-history"></i>
-                <span class="menu-title">Audit Logs</span>
-            </a>
+            <div class="collapse {% if request.resolver_match.namespace == 'stock' %}show{% endif %}"
+                 id="ui-stock">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'list' %}active{% endif %}"
+                           href="#">
+                            Add Stock In
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'create' %}active{% endif %}"
+                           href="#">
+                            Add Stock Out
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'create' %}active{% endif %}"
+                           href="#">
+                            Stock History
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
     </ul>
 </nav>
