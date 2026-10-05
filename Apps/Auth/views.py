@@ -92,13 +92,12 @@ def otp(request):
 
         user_otp = ''.join(otps)
 
-        if user_otp == otp_code: 
+        if user_otp == otp_code:
+            request.session['verified'] = True 
             return redirect('auth:done')
         else:
-            messages.error(
-                request,
-                "OTP isn't match."
-            )
+            request.session['verified'] = False
+            return redirect('auth:done')
 
     context = {
         'email': email
@@ -107,6 +106,27 @@ def otp(request):
     return render(request, 'otp.html', context)
 
 def done_verify(request):
+    if request.session.get('verified'):
+        status = 'success'
+    else:
+        status = 'denied'
     return render(request, 'done-verify.html', context={
-        'status': 'success'
+        'status': status
     })
+
+def new_password(request):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(
+                request,
+                "Passwords do not match."
+            )
+        else:
+            user = User.objects.filter(email=request.session.get('otp-email')).first()
+            user.set_password(password)
+            user.save()
+            return redirect('auth:login')
+    return render(request, 'new-password.html')

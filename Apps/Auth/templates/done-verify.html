@@ -25,7 +25,7 @@
                         You can now continue to reset your password.
                     </p>
 
-                    <a href="#"
+                    <a href="{% url 'auth:new-password' %}"
                        class="btn btn-success w-100">
                         Continue
                     </a>
@@ -48,7 +48,7 @@
                         Please try again.
                     </p>
 
-                    <a href="{% url 'auth:verify-email' %}"
+                    <a href="{% url 'auth:otp' %}"
                        class="btn btn-danger w-100">
                         Try Again
                     </a>
