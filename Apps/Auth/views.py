@@ -8,6 +8,11 @@ from decouple import config
 import random
 
 # Create your views here.
+custom_session = {
+    'email': '',
+    'otp-code': ''
+}
+
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()
@@ -60,9 +65,9 @@ def verify_email(request):
     if request.method == 'POST':
         try:
             to = request.POST.get("email").strip()
-            request.session['otp-email'] = to
+            custom_session['email'] = to
             unique_numbers = random.sample(range(1, 9), 6)
-            request.session['otp-code'] = ''.join(map(str, unique_numbers))
+            custom_session['otp-code'] = ''.join(map(str, unique_numbers))
 
             send_mail(
                 subject='Verify OTP',
@@ -81,8 +86,8 @@ def verify_email(request):
     return render(request, 'verify-email.html')
 
 def otp(request):
-    email = request.session.get('otp-email')
-    otp_code = request.session.get('otp-code')
+    email = custom_session['email']
+    otp_code = custom_session['otp-code']
 
     if request.method == 'POST':
         otps = []
@@ -115,6 +120,9 @@ def done_verify(request):
     })
 
 def new_password(request):
+    if custom_session['otp-code'] == '':
+        return redirect('auth:otp')
+
     if request.method == 'POST':
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
@@ -125,7 +133,7 @@ def new_password(request):
                 "Passwords do not match."
             )
         else:
-            user = User.objects.filter(email=request.session.get('otp-email')).first()
+            user = User.objects.filter(email=custom_session['email']).first()
             user.set_password(password)
             user.save()
             return redirect('auth:login')
