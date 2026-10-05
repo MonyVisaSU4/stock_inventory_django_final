@@ -17,6 +17,15 @@
                     an otp to reset password.
                 </p>
 
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
                 <form method="post">
                     {% csrf_token %}
 

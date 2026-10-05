@@ -18,9 +18,16 @@
                         Enter the 6-digit code sent to your email.
                     </p>
 
-                    <small class="text-muted">
-                        example@email.com
-                    </small>
+                    <small class="text-muted" id="send-to">{{ email }}</small>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger mt-3" role="alert">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <form method="post" id="otpForm">
@@ -106,7 +113,7 @@
                         Didn't receive the code?
                     </span>
 
-                    <a href="#" class="text-decoration-none">
+                    <a href="{% url 'auth:verify-email' %}" class="text-decoration-none">
                         Resend OTP
                     </a>
                 </div>
