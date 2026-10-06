@@ -1,0 +1,114 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Stock In{% endblock %}
+{% block page_title %}Stock In{% endblock %}
+{% block page_subtitle %}Add incoming inventory{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">Stock In</h5>
+        <p class="page-header-subtitle">Record incoming inventory from suppliers.</p>
+    </div>
+    <a href="{% url 'inventory:stock-history' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-clock-history me-1"></i> View History
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <div style="width:36px;height:36px;background:#e6f4ea;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-arrow-down-circle text-success fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-semibold mb-0">Stock In Form</h6>
+                    <p class="text-muted mb-0" style="font-size:0.78rem;">Receive new inventory into the system</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="stockInForm">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Product <span class="text-danger">*</span></label>
+                        {{ form.product }}
+                        {% if form.product.errors %}<div class="text-danger small mt-1">{{ form.product.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Location <span class="text-danger">*</span></label>
+                        {{ form.location }}
+                        {% if form.location.errors %}<div class="text-danger small mt-1">{{ form.location.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-success-subtle text-success border-success-subtle">
+                                <i class="bi bi-plus-lg"></i>
+                            </span>
+                            {{ form.quantity }}
+                        </div>
+                        {% if form.quantity.errors %}<div class="text-danger small mt-1">{{ form.quantity.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- Stock preview card -->
+                    <div class="alert alert-success-subtle border border-success-subtle rounded-3 py-2 px-3 mb-3" id="stockPreview" style="display:none;">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Current Stock</span>
+                            <span class="fw-semibold" id="previewCurrent">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Stock In</span>
+                            <span class="fw-semibold text-success" id="previewIn">—</span>
+                        </div>
+                        <hr class="my-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-medium small">New Stock</span>
+                            <span class="fw-bold text-success" id="previewNew">—</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Reference Number</label>
+                        {{ form.reference_no }}
+                        <div class="form-text">e.g. PO-2024-001</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Note (Optional)</label>
+                        {{ form.note }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'inventory:dashboard' %}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-arrow-down-circle me-1"></i> Confirm Stock In
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Simple stock preview based on quantity input
+document.getElementById('{{ form.quantity.id_for_label }}').addEventListener('input', function() {
+    const qty = parseInt(this.value) || 0;
+    if (qty > 0) {
+        document.getElementById('stockPreview').style.display = 'block';
+        document.getElementById('previewIn').textContent = '+' + qty;
+        document.getElementById('previewCurrent').textContent = '—';
+        document.getElementById('previewNew').textContent = '—';
+    } else {
+        document.getElementById('stockPreview').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

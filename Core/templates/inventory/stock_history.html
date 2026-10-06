@@ -1,0 +1,151 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Stock History{% endblock %}
+{% block page_title %}Stock History{% endblock %}
+{% block page_subtitle %}Complete transaction log{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">Stock History</h5>
+        <p class="page-header-subtitle">Complete audit trail of all inventory transactions.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'inventory:stock-in' %}" class="btn btn-success btn-sm"><i class="bi bi-arrow-down-circle me-1"></i>Stock In</a>
+        <a href="{% url 'inventory:stock-out' %}" class="btn btn-danger btn-sm"><i class="bi bi-arrow-up-circle me-1"></i>Stock Out</a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-sm-3">
+                <label class="form-label mb-1">Search</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Product or reference...">
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <label class="form-label mb-1">Type</label>
+                <select name="type" class="form-select form-select-sm">
+                    <option value="">All Types</option>
+                    {% for code, label in log_types %}
+                    <option value="{{ code }}" {% if selected_type == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <label class="form-label mb-1">Date From</label>
+                <input type="date" name="date_from" value="{{ date_from }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-sm-2">
+                <label class="form-label mb-1">Date To</label>
+                <input type="date" name="date_to" value="{{ date_to }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-sm-3 d-flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
+                <a href="{% url 'inventory:stock-history' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">Transactions
+            <span class="text-muted fw-normal ms-1" style="font-size:0.8rem;">({{ page_obj.paginator.count }} total)</span>
+        </span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Ref No.</th>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Location</th>
+                    <th>Note</th>
+                    <th>Created By</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td><small class="font-monospace text-muted">{{ log.reference_no|default:'—' }}</small></td>
+                    <td>
+                        <div class="fw-semibold" style="font-size:0.855rem;">{{ log.product.name }}</div>
+                        <small class="text-muted font-monospace">{{ log.product.sku }}</small>
+                    </td>
+                    <td>
+                        {% if log.log_type == 'STOCK_IN' %}
+                            <span class="badge bg-success">STOCK IN</span>
+                        {% elif log.log_type == 'STOCK_OUT' %}
+                            <span class="badge bg-danger">STOCK OUT</span>
+                        {% elif log.log_type == 'TRANSFER' %}
+                            <span class="badge bg-primary">TRANSFER</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">ADJUSTMENT</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="fw-bold {% if log.quantity_changed > 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if log.quantity_changed > 0 %}+{% endif %}{{ log.quantity_changed }}
+                        </span>
+                    </td>
+                    <td>
+                        <small>
+                            {% if log.source_location and log.destination_location %}
+                                {{ log.source_location.name }} → {{ log.destination_location.name }}
+                            {% elif log.destination_location %}
+                                {{ log.destination_location.name }}
+                            {% elif log.source_location %}
+                                {{ log.source_location.name }}
+                            {% else %}—{% endif %}
+                        </small>
+                    </td>
+                    <td><small class="text-muted">{{ log.reason|default:'—'|truncatechars:35 }}</small></td>
+                    <td><small class="text-muted">{{ log.performed_by.username|default:'System' }}</small></td>
+                    <td><small class="text-muted">{{ log.created_at|date:"M d, Y H:i" }}</small></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-5 text-muted">
+                        <i class="bi bi-clock-history fs-1 d-block mb-2"></i>
+                        No transactions found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer d-flex align-items-center justify-content-between py-2">
+        <small class="text-muted">
+            Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+        </small>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&type={{ selected_type }}&date_from={{ date_from }}&date_to={{ date_to }}"><i class="bi bi-chevron-left"></i></a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}&q={{ query }}&type={{ selected_type }}&date_from={{ date_from }}&date_to={{ date_to }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&type={{ selected_type }}&date_from={{ date_from }}&date_to={{ date_to }}"><i class="bi bi-chevron-right"></i></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

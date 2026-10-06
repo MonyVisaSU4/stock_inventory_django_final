@@ -1,0 +1,135 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Suppliers{% endblock %}
+{% block page_title %}Suppliers{% endblock %}
+{% block page_subtitle %}Manage product suppliers{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">Suppliers</h5>
+        <p class="page-header-subtitle">Manage your product suppliers and vendors.</p>
+    </div>
+    {% if request.user.role != 'STAFF' %}
+    <a href="{% url 'inventory:supplier-add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Add Supplier
+    </a>
+    {% endif %}
+</div>
+
+<!-- Search Bar -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="GET" class="d-flex gap-2">
+            <div class="input-group input-group-sm" style="max-width:360px;">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search supplier name or email...">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            {% if query %}<a href="{% url 'inventory:supplier-list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>{% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Supplier Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Products</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for supplier in suppliers %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ supplier.name }}</div>
+                    </td>
+                    <td><small>{{ supplier.contact_phone|default:'—' }}</small></td>
+                    <td><small>{{ supplier.contact_email|default:'—' }}</small></td>
+                    <td><small class="text-muted">{{ supplier.address|default:'—'|truncatechars:40 }}</small></td>
+                    <td>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                            {{ supplier.product_count }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if supplier.status == 'ACTIVE' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'inventory:supplier-detail' supplier.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if request.user.role != 'STAFF' %}
+                            <a href="{% url 'inventory:supplier-edit' supplier.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% endif %}
+                            {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="confirmDeleteSupplier({{ supplier.pk }}, '{{ supplier.name|escapejs }}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="bi bi-truck fs-1 d-block mb-2"></i>
+                        No suppliers yet. <a href="{% url 'inventory:supplier-add' %}">Add your first supplier</a>.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteSupplierModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-semibold">Delete Supplier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-exclamation-triangle text-danger fs-1 d-block mb-2"></i>
+                <p>Are you sure you want to delete <strong id="deleteSupplierName"></strong>?</p>
+                <p class="text-muted small">Products associated with this supplier will be unlinked.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteSupplierForm" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDeleteSupplier(pk, name) {
+    document.getElementById('deleteSupplierName').textContent = name;
+    document.getElementById('deleteSupplierForm').action = '/suppliers/' + pk + '/delete/';
+    new bootstrap.Modal(document.getElementById('deleteSupplierModal')).show();
+}
+</script>
+{% endblock %}

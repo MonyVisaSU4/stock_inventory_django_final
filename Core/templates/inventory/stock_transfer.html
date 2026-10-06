@@ -1,93 +1,136 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block title %}Atomic Stock Transfer | Stock Inventory{% endblock %}
+{% block title %}Stock Transfer{% endblock %}
+{% block page_title %}Stock Transfer{% endblock %}
+{% block page_subtitle %}Move inventory between locations{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8 grid-margin stretch-card">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="p-3 bg-primary-subtle text-primary rounded-3 me-3" style="background-color: #e8f0fe;">
-                        <i class="mdi mdi-swap-horizontal-bold fs-2 text-primary"></i>
-                    </div>
-                    <div>
-                        <h4 class="card-title mb-1 fw-bold">Atomic Stock Transfer Engine</h4>
-                        <p class="text-muted mb-0 small">Transfer inventory between warehouses and retail store nodes safely with row locking.</p>
-                    </div>
-                </div>
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">Stock Transfer</h5>
+        <p class="page-header-subtitle">Atomically move inventory between warehouses and retail store nodes.</p>
+    </div>
+    <a href="{% url 'inventory:stock-history' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-clock-history me-1"></i> View History
+    </a>
+</div>
 
-                <form method="POST" action="{% url 'inventory:transfer' %}" class="forms-sample">
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <div style="width:36px;height:36px;background:#e8f0fe;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-arrow-left-right text-primary fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-semibold mb-0">Transfer Form</h6>
+                    <p class="text-muted mb-0" style="font-size:0.78rem;">Transfer stock between locations with atomic row locking</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'inventory:transfer' %}">
                     {% csrf_token %}
-                    
-                    <!-- Product Selection -->
-                    <div class="form-group mb-3">
-                        <label class="fw-semibold text-dark">Select Product</label>
-                        <select name="product_id" id="product_select" class="form-select form-control" required>
-                            <option value="">-- Choose Product SKU --</option>
+
+                    <div class="mb-3">
+                        <label class="form-label">Product <span class="text-danger">*</span></label>
+                        <select name="product_id" id="product_select" class="form-select" required>
+                            <option value="">-- Select Product --</option>
                             {% for product in products %}
-                                <option value="{{ product.id }}">
-                                    {{ product.sku }} — {{ product.name }} (Total Units: {{ product.total_stock }})
-                                </option>
+                            <option value="{{ product.id }}">
+                                {{ product.sku }} — {{ product.name }} (Total: {{ product.total_stock }} units)
+                            </option>
                             {% endfor %}
                         </select>
                     </div>
 
-                    <div class="row">
-                        <!-- Source Location -->
-                        <div class="col-md-6 form-group mb-3">
-                            <label class="fw-semibold text-dark">Source Node (From)</label>
-                            <select name="source_location_id" id="source_location" class="form-select form-control" required>
-                                <option value="">-- Source Location --</option>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Source Location <span class="text-danger">*</span></label>
+                            <select name="source_location_id" id="source_location" class="form-select" required>
+                                <option value="">-- From Location --</option>
                                 {% for location in locations %}
-                                    <option value="{{ location.id }}">
-                                        {{ location.name }} ({{ location.get_location_type_display }})
-                                    </option>
+                                <option value="{{ location.id }}">
+                                    {{ location.name }}
+                                </option>
                                 {% endfor %}
                             </select>
-                            <small class="text-muted">Stock will be decremented from this location.</small>
+                            <div class="form-text">Stock will be deducted from here.</div>
                         </div>
-
-                        <!-- Destination Location -->
-                        <div class="col-md-6 form-group mb-3">
-                            <label class="fw-semibold text-dark">Destination Node (To)</label>
-                            <select name="destination_location_id" id="destination_location" class="form-select form-control" required>
-                                <option value="">-- Destination Location --</option>
+                        <div class="col-md-6">
+                            <label class="form-label">Destination Location <span class="text-danger">*</span></label>
+                            <select name="destination_location_id" id="destination_location" class="form-select" required>
+                                <option value="">-- To Location --</option>
                                 {% for location in locations %}
-                                    <option value="{{ location.id }}">
-                                        {{ location.name }} ({{ location.get_location_type_display }})
-                                    </option>
+                                <option value="{{ location.id }}">
+                                    {{ location.name }}
+                                </option>
                                 {% endfor %}
                             </select>
-                            <small class="text-muted">Stock will be atomically credited to this location.</small>
+                            <div class="form-text">Stock will be credited here.</div>
                         </div>
                     </div>
 
-                    <!-- Quantity -->
-                    <div class="form-group mb-3">
-                        <label class="fw-semibold text-dark">Quantity to Relocate</label>
+                    <!-- Transfer arrow visual -->
+                    <div class="text-center py-2 mb-3">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+                            <i class="bi bi-arrow-left-right me-1"></i> Transfer
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quantity <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="mdi mdi-numeric"></i></span>
-                            <input type="number" name="quantity" min="1" class="form-control" placeholder="Enter transfer amount (e.g., 25)" required>
+                            <span class="input-group-text bg-primary-subtle text-primary border-primary-subtle">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </span>
+                            <input type="number" name="quantity" id="transfer_quantity" min="1"
+                                   class="form-control" placeholder="Enter quantity to transfer" required>
                         </div>
                     </div>
 
-                    <!-- Reason / Note -->
-                    <div class="form-group mb-4">
-                        <label class="fw-semibold text-dark">Reason / Manifest Note (Optional)</label>
-                        <textarea name="reason" rows="2" class="form-control" placeholder="e.g., Weekly replenishment for downtown branch"></textarea>
+                    <div class="mb-4">
+                        <label class="form-label">Reason / Note (Optional)</label>
+                        <textarea name="reason" rows="3" class="form-control"
+                                  placeholder="e.g., Weekly replenishment for downtown branch"></textarea>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-2">
                         <a href="{% url 'inventory:dashboard' %}" class="btn btn-light">Cancel</a>
-                        <button type="submit" class="btn btn-primary text-white px-4">
-                            <i class="mdi mdi-check-circle me-1"></i> Execute Atomic Transfer
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-arrow-left-right me-1"></i> Execute Transfer
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+
+        <!-- Info card -->
+        <div class="alert alert-info mt-3" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Atomic Transfer</strong> — Stock movements use database row-locking to prevent race conditions.
+            The operation will roll back entirely if the source has insufficient quantity.
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Prevent selecting the same source and destination
+document.getElementById('destination_location').addEventListener('change', function() {
+    const src = document.getElementById('source_location').value;
+    if (src && this.value && src === this.value) {
+        alert('Source and destination locations cannot be the same.');
+        this.value = '';
+    }
+});
+document.getElementById('source_location').addEventListener('change', function() {
+    const dest = document.getElementById('destination_location').value;
+    if (dest && this.value && dest === this.value) {
+        alert('Source and destination locations cannot be the same.');
+        this.value = '';
+    }
+});
+</script>
 {% endblock %}

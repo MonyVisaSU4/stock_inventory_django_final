@@ -1,0 +1,115 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ supplier.name }}{% endblock %}
+{% block page_title %}Supplier Detail{% endblock %}
+{% block page_subtitle %}{{ supplier.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">{{ supplier.name }}</h5>
+    </div>
+    <div class="d-flex gap-2">
+        {% if request.user.role != 'STAFF' %}
+        <a href="{% url 'inventory:supplier-edit' supplier.pk %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-pencil me-1"></i> Edit
+        </a>
+        {% endif %}
+        <a href="{% url 'inventory:supplier-list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h6 class="fw-semibold mb-0">Supplier Information</h6></div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted small">Name</span>
+                    <span class="fw-semibold">{{ supplier.name }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted small">Email</span>
+                    <span>{{ supplier.contact_email|default:'—' }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted small">Phone</span>
+                    <span>{{ supplier.contact_phone|default:'—' }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted small">Status</span>
+                    {% if supplier.status == 'ACTIVE' %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+                <div class="py-2">
+                    <span class="text-muted small d-block mb-1">Address</span>
+                    <span>{{ supplier.address|default:'No address provided' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-semibold mb-0">Products Supplied</h6>
+                <span class="badge bg-primary">{{ products.count }}</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'inventory:product-detail' product.pk %}" class="fw-semibold text-decoration-none">
+                                    {{ product.name }}
+                                </a>
+                            </td>
+                            <td><code class="text-muted">{{ product.sku }}</code></td>
+                            <td>${{ product.retail_price }}</td>
+                            <td>
+                                {% with total=product.total_stock %}
+                                {% if total == 0 %}
+                                    <span class="badge bg-danger">0</span>
+                                {% elif total <= product.low_stock_alert %}
+                                    <span class="badge bg-warning text-dark">{{ total }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ total }}</span>
+                                {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td>
+                                {% if product.status == 'ACTIVE' %}
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary">{{ product.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">No products linked to this supplier.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

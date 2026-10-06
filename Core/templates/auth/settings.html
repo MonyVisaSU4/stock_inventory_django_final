@@ -1,0 +1,101 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Application and account settings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h5 class="page-header-title">Settings</h5>
+</div>
+
+<div class="row g-3">
+    <!-- Account Settings -->
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header"><h6 class="fw-semibold mb-0">Account Settings</h6></div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'auth:profile-edit' %}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
+                    <div style="width:38px;height:38px;background:#e8f0fe;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-person text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-medium">Edit Profile</div>
+                        <div class="text-muted small">Update your name, email, and phone number</div>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+                <a href="{% url 'auth:change-password' %}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
+                    <div style="width:38px;height:38px;background:#e6f4ea;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-key text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-medium">Change Password</div>
+                        <div class="text-muted small">Update your account password</div>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- System Settings (placeholder) -->
+        <div class="card mb-3">
+            <div class="card-header"><h6 class="fw-semibold mb-0">System Preferences</h6></div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Language</label>
+                        <select class="form-select form-select-sm" disabled>
+                            <option>English (US)</option>
+                        </select>
+                        <div class="form-text">Language preference (coming soon)</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Date Format</label>
+                        <select class="form-select form-select-sm" disabled>
+                            <option>MM/DD/YYYY</option>
+                        </select>
+                        <div class="form-text">Date format preference (coming soon)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin-only: User Management -->
+        {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
+        <div class="card">
+            <div class="card-header"><h6 class="fw-semibold mb-0">Administration</h6></div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'auth:user-list' %}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
+                    <div style="width:38px;height:38px;background:#fce8e6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-people text-danger"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-medium">User Management</div>
+                        <div class="text-muted small">Create, edit, and manage user accounts</div>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Profile Summary -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h6 class="fw-semibold mb-0">Your Account</h6></div>
+            <div class="card-body text-center py-4">
+                <div class="mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:70px;height:70px;background:#e8f0fe;font-size:1.8rem;font-weight:700;color:#1a73e8;">
+                    {{ request.user.username|first|upper }}
+                </div>
+                <h6 class="fw-bold mb-1">{{ request.user.get_full_name|default:request.user.username }}</h6>
+                <p class="text-muted small mb-2">{{ request.user.email|default:'No email set' }}</p>
+                <span class="badge bg-primary">{{ request.user.get_role_display }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

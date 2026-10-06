@@ -1,0 +1,183 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+{% block page_title %}Product Detail{% endblock %}
+{% block page_subtitle %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">{{ product.name }}</h5>
+        <p class="page-header-subtitle"><code>{{ product.sku }}</code></p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'inventory:stock-in' %}" class="btn btn-success btn-sm">
+            <i class="bi bi-arrow-down-circle me-1"></i> Stock In
+        </a>
+        <a href="{% url 'inventory:stock-out' %}" class="btn btn-danger btn-sm">
+            <i class="bi bi-arrow-up-circle me-1"></i> Stock Out
+        </a>
+        {% if request.user.role != 'STAFF' %}
+        <a href="{% url 'inventory:product-edit' product.pk %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-pencil me-1"></i> Edit
+        </a>
+        {% endif %}
+        <a href="{% url 'inventory:product-list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body text-center py-4">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                     style="max-width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:1px solid #e9ecef;">
+                {% else %}
+                <div style="width:100%;height:180px;background:#f0f2f5;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-image text-muted" style="font-size:3rem;"></i>
+                </div>
+                {% endif %}
+                <h5 class="fw-bold mt-3 mb-1">{{ product.name }}</h5>
+                <code class="text-muted">{{ product.sku }}</code>
+                <div class="mt-2">
+                    {% if product.status == 'ACTIVE' %}
+                        <span class="badge bg-success">Active</span>
+                    {% elif product.status == 'INACTIVE' %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% else %}
+                        <span class="badge bg-dark">Discontinued</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Summary -->
+        <div class="card">
+            <div class="card-header"><h6 class="fw-semibold mb-0">Stock Summary</h6></div>
+            <div class="card-body">
+                {% with total=product.total_stock %}
+                <div class="text-center mb-3">
+                    <div style="font-size:2.5rem;font-weight:700;color:{% if total == 0 %}#dc3545{% elif total <= product.low_stock_alert %}#fd7e14{% else %}#198754{% endif %};">
+                        {{ total }}
+                    </div>
+                    <div class="text-muted small">Total Units in Stock</div>
+                    <div class="mt-1">
+                        {% if total == 0 %}
+                            <span class="badge bg-danger">Out of Stock</span>
+                        {% elif total <= product.low_stock_alert %}
+                            <span class="badge bg-warning text-dark">Low Stock</span>
+                        {% else %}
+                            <span class="badge bg-success">In Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endwith %}
+
+                <div class="d-flex justify-content-between py-2 border-top">
+                    <span class="text-muted small">Min Stock Alert</span>
+                    <span class="fw-semibold">{{ product.low_stock_alert }}</span>
+                </div>
+                {% for stock in product.stocks.all %}
+                <div class="d-flex justify-content-between py-2 border-top">
+                    <span class="text-muted small">{{ stock.location.name }}</span>
+                    <span class="fw-semibold">{{ stock.quantity }}</span>
+                </div>
+                {% empty %}
+                <div class="text-muted small text-center pt-2">No location stock records</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header"><h6 class="fw-semibold mb-0">Product Information</h6></div>
+            <div class="card-body">
+                <div class="row g-0">
+                    <div class="col-sm-4 py-2 px-3 border-bottom text-muted small fw-medium">Category</div>
+                    <div class="col-sm-8 py-2 px-3 border-bottom">{{ product.category.name|default:'—' }}</div>
+
+                    <div class="col-sm-4 py-2 px-3 border-bottom text-muted small fw-medium">Supplier</div>
+                    <div class="col-sm-8 py-2 px-3 border-bottom">
+                        {% if product.supplier %}
+                        <a href="{% url 'inventory:supplier-detail' product.supplier.pk %}">{{ product.supplier.name }}</a>
+                        {% else %}—{% endif %}
+                    </div>
+
+                    <div class="col-sm-4 py-2 px-3 border-bottom text-muted small fw-medium">Retail Price</div>
+                    <div class="col-sm-8 py-2 px-3 border-bottom fw-semibold text-success">${{ product.retail_price }}</div>
+
+                    <div class="col-sm-4 py-2 px-3 border-bottom text-muted small fw-medium">Cost Price</div>
+                    <div class="col-sm-8 py-2 px-3 border-bottom">${{ product.cost_price }}</div>
+
+                    <div class="col-sm-4 py-2 px-3 border-bottom text-muted small fw-medium">Description</div>
+                    <div class="col-sm-8 py-2 px-3 border-bottom">{{ product.description|default:'No description' }}</div>
+
+                    <div class="col-sm-4 py-2 px-3 border-bottom text-muted small fw-medium">Created</div>
+                    <div class="col-sm-8 py-2 px-3 border-bottom">{{ product.created_at|date:"M d, Y" }}</div>
+
+                    <div class="col-sm-4 py-2 px-3 text-muted small fw-medium">Last Updated</div>
+                    <div class="col-sm-8 py-2 px-3">{{ product.updated_at|date:"M d, Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock History -->
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-semibold mb-0">Stock History</h6>
+                <a href="{% url 'inventory:stock-history' %}?q={{ product.sku }}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Qty</th>
+                            <th>Location</th>
+                            <th>Reference</th>
+                            <th>User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in stock_history %}
+                        <tr>
+                            <td><small class="text-muted">{{ log.created_at|date:"M d, H:i" }}</small></td>
+                            <td>
+                                {% if log.log_type == 'STOCK_IN' %}<span class="badge bg-success">STOCK IN</span>
+                                {% elif log.log_type == 'STOCK_OUT' %}<span class="badge bg-danger">STOCK OUT</span>
+                                {% elif log.log_type == 'TRANSFER' %}<span class="badge bg-primary">TRANSFER</span>
+                                {% else %}<span class="badge bg-warning text-dark">ADJUSTMENT</span>{% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-semibold {% if log.quantity_changed > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {% if log.quantity_changed > 0 %}+{% endif %}{{ log.quantity_changed }}
+                                </span>
+                            </td>
+                            <td>
+                                <small>
+                                    {% if log.destination_location %}{{ log.destination_location.name }}
+                                    {% elif log.source_location %}{{ log.source_location.name }}
+                                    {% else %}—{% endif %}
+                                </small>
+                            </td>
+                            <td><small class="text-muted font-monospace">{{ log.reference_no|default:'—' }}</small></td>
+                            <td><small class="text-muted">{{ log.performed_by.username|default:'System' }}</small></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-3 text-muted">No stock history.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

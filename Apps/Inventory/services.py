@@ -11,19 +11,17 @@ class InventoryService:
 
     @staticmethod
     @transaction.atomic
-    def transfer_stock(product_id, source_location_id, destination_location_id, quantity, user=None, reason=None):
+    def transfer_stock(product_id, source_location_id, destination_location_id, quantity, user=None, reason=None, reference_no=None):
         if quantity <= 0:
             raise ValidationError("Transfer quantity must be greater than zero.")
-        
+
         if str(source_location_id) == str(destination_location_id):
             raise ValidationError("Source and destination locations cannot be identical.")
 
-        # 1. Fetch product & locations
         product = Product.objects.get(pk=product_id)
         source_loc = Location.objects.get(pk=source_location_id)
         dest_loc = Location.objects.get(pk=destination_location_id)
 
-        # 2. Lock and retrieve source stock
         try:
             source_stock = ProductLocation.objects.select_for_update().get(
                 product=product,
@@ -37,11 +35,9 @@ class InventoryService:
                 f"Insufficient stock at {source_loc.name}. Available: {source_stock.quantity}, Requested: {quantity}."
             )
 
-        # 3. Deduct from source
         source_stock.quantity -= quantity
         source_stock.save()
 
-        # 4. Lock / get-or-create destination stock
         dest_stock, _ = ProductLocation.objects.select_for_update().get_or_create(
             product=product,
             location=dest_loc,
@@ -50,7 +46,6 @@ class InventoryService:
         dest_stock.quantity += quantity
         dest_stock.save()
 
-        # 5. Audit Log
         actor_name = user.username if user and user.is_authenticated else "System"
         audit_reason = reason or f"Transferred by {actor_name}"
         log = InventoryLog.objects.create(
@@ -59,7 +54,9 @@ class InventoryService:
             log_type='TRANSFER',
             source_location=source_loc,
             destination_location=dest_loc,
-            reason=audit_reason
+            reason=audit_reason,
+            reference_no=reference_no,
+            performed_by=user if user and user.is_authenticated else None
         )
 
         return {
@@ -71,7 +68,7 @@ class InventoryService:
 
     @staticmethod
     @transaction.atomic
-    def checkout_stock(product_id, location_id, quantity, user=None, reason=None):
+    def checkout_stock(product_id, location_id, quantity, user=None, reason=None, reference_no=None):
         if quantity <= 0:
             raise ValidationError("Checkout quantity must be greater than zero.")
 
@@ -102,7 +99,9 @@ class InventoryService:
             log_type='STOCK_OUT',
             source_location=location,
             destination_location=None,
-            reason=audit_reason
+            reason=audit_reason,
+            reference_no=reference_no,
+            performed_by=user if user and user.is_authenticated else None
         )
 
         return {
@@ -113,7 +112,7 @@ class InventoryService:
 
     @staticmethod
     @transaction.atomic
-    def intake_stock(product_id, location_id, quantity, user=None, reason=None):
+    def intake_stock(product_id, location_id, quantity, user=None, reason=None, reference_no=None):
         if quantity <= 0:
             raise ValidationError("Intake quantity must be greater than zero.")
 
@@ -136,7 +135,9 @@ class InventoryService:
             log_type='STOCK_IN',
             source_location=None,
             destination_location=location,
-            reason=audit_reason
+            reason=audit_reason,
+            reference_no=reference_no,
+            performed_by=user if user and user.is_authenticated else None
         )
 
         return {
@@ -172,7 +173,8 @@ class InventoryService:
             log_type='ADJUSTMENT',
             source_location=location,
             destination_location=None,
-            reason=audit_reason
+            reason=audit_reason,
+            performed_by=user if user and user.is_authenticated else None
         )
 
         return {

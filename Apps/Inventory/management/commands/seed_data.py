@@ -13,7 +13,7 @@ class Command(BaseCommand):
         users_data = [
             {'username': 'admin', 'email': 'admin@invenstock.com', 'role': 'ADMIN', 'is_staff': True, 'is_superuser': True},
             {'username': 'manager', 'email': 'manager@invenstock.com', 'role': 'MANAGER', 'is_staff': False, 'is_superuser': False},
-            {'username': 'cashier', 'email': 'cashier@invenstock.com', 'role': 'CASHIER', 'is_staff': False, 'is_superuser': False},
+            {'username': 'staff', 'email': 'staff@invenstock.com', 'role': 'STAFF', 'is_staff': False, 'is_superuser': False},
         ]
 
         for u in users_data:
@@ -35,6 +35,10 @@ class Command(BaseCommand):
             user.save()
             action = "Created" if created else "Updated"
             self.stdout.write(f" - {action} user: {user.username} ({user.role}) [Password: password123]")
+
+        converted = User.objects.filter(role='CASHIER').update(role='STAFF')
+        if converted:
+            self.stdout.write(f" - Converted {converted} existing user(s) from CASHIER to STAFF")
 
         # 2. Suppliers
         suppliers_data = [

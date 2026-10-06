@@ -4,12 +4,18 @@ from django.db import models
 
 class User(AbstractUser):
     ROLE_CHOICES = (
-        ('ADMIN', 'IT Administrator'),
+        ('ADMIN', 'Administrator'),
         ('MANAGER', 'Warehouse Manager'),
-        ('CASHIER', 'Store Cashier'),
+        ('STAFF', 'Staff'),
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CASHIER')
-    status = models.CharField(max_length=20, default='ACTIVE')
+    STATUS_CHOICES = (
+        ('ACTIVE', 'Active'),
+        ('INACTIVE', 'Inactive'),
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='STAFF')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='ACTIVE')
+    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"

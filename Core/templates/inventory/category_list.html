@@ -1,0 +1,210 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Categories{% endblock %}
+{% block page_title %}Categories{% endblock %}
+{% block page_subtitle %}Manage product categories{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">Categories</h5>
+        <p class="page-header-subtitle">Organize your products with categories.</p>
+    </div>
+    {% if request.user.role != 'STAFF' %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        <i class="bi bi-plus-lg me-1"></i> Add Category
+    </button>
+    {% endif %}
+</div>
+
+<!-- Search Filter -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="GET" class="d-flex gap-2 align-items-center">
+            <div class="input-group input-group-sm" style="max-width:360px;">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search category name...">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            {% if query %}<a href="{% url 'inventory:category-list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>{% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th>Products</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td class="text-muted small">{{ forloop.counter }}</td>
+                    <td>
+                        <div class="fw-semibold">{{ category.name }}</div>
+                    </td>
+                    <td>
+                        <span class="text-muted small">{{ category.description|default:'—'|truncatechars:50 }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                            {{ category.product_count }} products
+                        </span>
+                    </td>
+                    <td>
+                        {% if category.status == 'ACTIVE' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td><small class="text-muted">{{ category.created_at|date:"M d, Y" }}</small></td>
+                    <td>
+                        {% if request.user.role != 'STAFF' %}
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    onclick="openEditModal({{ category.pk }}, '{{ category.name|escapejs }}', '{{ category.description|default:''|escapejs }}', '{{ category.status }}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            {% if request.user.role == 'ADMIN' or request.user.is_superuser %}
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="confirmDeleteCategory({{ category.pk }}, '{{ category.name|escapejs }}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="bi bi-tags fs-1 d-block mb-2"></i>
+                        No categories yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'inventory:category-add' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title fw-semibold">Add Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                        {{ form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        {{ form.description }}
+                    </div>
+                    <div>
+                        <label class="form-label">Status</label>
+                        {{ form.status }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="POST" id="editCategoryForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title fw-semibold">Edit Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="editCategoryName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" id="editCategoryDesc" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label">Status</label>
+                        <select name="status" id="editCategoryStatus" class="form-select">
+                            <option value="ACTIVE">Active</option>
+                            <option value="INACTIVE">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-semibold">Delete Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-exclamation-triangle text-danger fs-1 d-block mb-2"></i>
+                <p>Are you sure you want to delete <strong id="deleteCategoryName"></strong>?</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteCategoryForm" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openEditModal(pk, name, description, status) {
+    document.getElementById('editCategoryName').value = name;
+    document.getElementById('editCategoryDesc').value = description;
+    document.getElementById('editCategoryStatus').value = status;
+    document.getElementById('editCategoryForm').action = '/categories/' + pk + '/edit/';
+    new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+}
+function confirmDeleteCategory(pk, name) {
+    document.getElementById('deleteCategoryName').textContent = name;
+    document.getElementById('deleteCategoryForm').action = '/categories/' + pk + '/delete/';
+    new bootstrap.Modal(document.getElementById('deleteCategoryModal')).show();
+}
+</script>
+{% endblock %}

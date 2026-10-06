@@ -1,0 +1,98 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}User Management{% endblock %}
+{% block page_title %}User Management{% endblock %}
+{% block page_subtitle %}Admin — manage all system users{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5 class="page-header-title">User Management</h5>
+        <p class="page-header-subtitle">Create and manage system user accounts.</p>
+    </div>
+    <a href="{% url 'auth:user-create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Create User
+    </a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width:34px;height:34px;background:#e8f0fe;font-size:0.85rem;font-weight:700;color:#1a73e8;flex-shrink:0;">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-semibold" style="font-size:0.875rem;">
+                                    {{ user.get_full_name|default:user.username }}
+                                    {% if user == request.user %}<span class="badge bg-secondary ms-1">You</span>{% endif %}
+                                </div>
+                                <small class="text-muted">@{{ user.username }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><small>{{ user.email|default:'—' }}</small></td>
+                    <td>
+                        {% if user.role == 'ADMIN' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Admin</span>
+                        {% elif user.role == 'MANAGER' %}
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Manager</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Staff</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.status == 'ACTIVE' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td><small class="text-muted">{{ user.last_login|date:"M d, Y"|default:'Never' }}</small></td>
+                    <td><small class="text-muted">{{ user.date_joined|date:"M d, Y" }}</small></td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'auth:user-edit' user.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% if user != request.user %}
+                            <form method="POST" action="{% url 'auth:user-toggle-status' user.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm {% if user.status == 'ACTIVE' %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                                        title="{% if user.status == 'ACTIVE' %}Deactivate{% else %}Activate{% endif %}">
+                                    <i class="bi bi-{% if user.status == 'ACTIVE' %}pause-circle{% else %}play-circle{% endif %}"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="bi bi-people fs-1 d-block mb-2"></i>No users found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
