@@ -8,10 +8,6 @@ from decouple import config
 import random
 
 # Create your views here.
-custom_session = {
-    'email': '',
-    'otp-code': ''
-}
 
 def login_view(request):
     if request.method == "POST":
@@ -65,9 +61,9 @@ def verify_email(request):
     if request.method == 'POST':
         try:
             to = request.POST.get("email").strip()
-            custom_session['email'] = to
+            request.session['email'] = to
             unique_numbers = random.sample(range(1, 9), 6)
-            custom_session['otp-code'] = ''.join(map(str, unique_numbers))
+            request.session['otp-code'] = ''.join(map(str, unique_numbers))
 
             send_mail(
                 subject='Verify OTP',
@@ -86,10 +82,11 @@ def verify_email(request):
     return render(request, 'verify-email.html')
 
 def otp(request):
-    email = custom_session['email']
-    otp_code = custom_session['otp-code']
+    email = request.session.get('email')
+    otp_code = request.session.get('otp-code')
 
     if request.method == 'POST':
+        request.session['otp-reach'] = True
         otps = []
 
         for i in range(6):
@@ -120,7 +117,7 @@ def done_verify(request):
     })
 
 def new_password(request):
-    if custom_session['otp-code'] == '':
+    if not request.session.get('otp-reach'):
         return redirect('auth:otp')
 
     if request.method == 'POST':
