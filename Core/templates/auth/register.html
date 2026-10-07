@@ -1,0 +1,133 @@
+{% extends "core/base-auth.html" %}
+{% load static %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center p-3">
+    <div class="row w-100" style="max-width: 950px;">
+        <!-- Left panel (branding) -->
+        <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-center pe-5">
+            <div class="mb-4">
+                <div class="d-flex align-items-center mb-4">
+                    <div style="width:48px;height:48px;background:#0d6efd;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:12px;">
+                        <i class="bi bi-boxes text-white fs-4"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-white fw-bold mb-0" style="font-size:1.4rem;">InvenStock</h2>
+                        <p class="mb-0" style="color:rgba(255,255,255,0.5);font-size:0.8rem;">Inventory Management System</p>
+                    </div>
+                </div>
+                <h1 class="text-white fw-bold mb-3" style="font-size:1.8rem;line-height:1.3;">
+                    Join InvenStock Today
+                </h1>
+                <p style="color:rgba(255,255,255,0.55);font-size:0.9rem;line-height:1.7;">
+                    Create an account to track products, manage transactions, monitor stock levels, and receive real-time email security codes.
+                </p>
+            </div>
+            <div class="d-flex flex-column gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-check" style="color:#0d6efd;"></i>
+                    <span style="color:rgba(255,255,255,0.65);font-size:0.85rem;">Email OTP security verification</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-check" style="color:#0d6efd;"></i>
+                    <span style="color:rgba(255,255,255,0.65);font-size:0.85rem;">Instant activation</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-check" style="color:#0d6efd;"></i>
+                    <span style="color:rgba(255,255,255,0.65);font-size:0.85rem;">Staff role access</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right panel (register form) -->
+        <div class="col-lg-7 col-12">
+            <div class="bg-white rounded-4 p-4 p-sm-5 shadow">
+                <!-- Logo for mobile -->
+                <div class="d-flex d-lg-none align-items-center mb-4">
+                    <div style="width:38px;height:38px;background:#0d6efd;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:10px;">
+                        <i class="bi bi-boxes text-white"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">InvenStock</h5>
+                        <p class="text-muted mb-0" style="font-size:0.75rem;">Inventory Management</p>
+                    </div>
+                </div>
+
+                <h4 class="fw-bold mb-1">Create an Account</h4>
+                <p class="text-muted mb-4" style="font-size:0.9rem;">Sign up and verify your email to get started.</p>
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show py-2 px-3" role="alert" style="font-size:0.875rem;">
+                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" style="font-size:0.7rem;"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" action="{% url 'auth:register' %}">
+                    {% csrf_token %}
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-medium">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-medium">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Email Address</label>
+                        {{ form.email }}
+                        <div class="form-text">We'll send a 6-digit OTP code to this email.</div>
+                        {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="row g-2 mb-4">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-medium">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-medium">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                        <i class="bi bi-person-plus me-2"></i>Create Account & Verify
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <p class="text-muted mb-0" style="font-size:0.875rem;">
+                            Already have an account? <a href="{% url 'auth:login' %}" class="text-primary fw-semibold text-decoration-none">Sign In</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center mt-3">
+                <p style="color:rgba(255,255,255,0.35);font-size:0.78rem;">
+                    &copy; {% now "Y" %} InvenStock — Year 4 University Project
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

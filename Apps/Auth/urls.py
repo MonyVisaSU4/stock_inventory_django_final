@@ -6,6 +6,13 @@ app_name = 'auth'
 urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('register/', views.register_view, name='register'),
+
+    # Email OTP verification
+    path('verify-email/', views.verify_email_view, name='verify-email'),
+    path('resend-otp/', views.resend_otp_view, name='resend-otp'),
+    path('send-otp/', views.send_otp_view, name='send-otp'),
+
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.profile_edit_view, name='profile-edit'),
     path('profile/change-password/', views.change_password_view, name='change-password'),

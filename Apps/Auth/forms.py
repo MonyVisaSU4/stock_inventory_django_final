@@ -119,3 +119,27 @@ class RegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class OTPVerifyForm(forms.Form):
+    """Form for verifying the 6-digit email OTP."""
+    otp = forms.CharField(
+        max_length=6,
+        min_length=6,
+        label='Verification Code',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-lg text-center otp-input',
+            'placeholder': '• • • • • •',
+            'maxlength': '6',
+            'inputmode': 'numeric',
+            'autocomplete': 'one-time-code',
+            'autofocus': True,
+        })
+    )
+
+    def clean_otp(self):
+        otp = self.cleaned_data.get('otp', '').strip()
+        if not otp.isdigit():
+            raise forms.ValidationError("OTP must contain digits only.")
+        return otp
+

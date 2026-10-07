@@ -57,7 +57,7 @@
                   <button type="submit" class="btn btn-block btn-primary btn-lg fw-medium auth-form-btn">SIGN IN</button>
                 </div>
 
-                {% url 'password_reset' as reset_url %}
+                {% url 'auth:verify-email' as reset_url %}
                 {% if reset_url %}
                   <div class="my-2 d-flex justify-content-end align-items-center">
                     <a href="{{ reset_url }}" class="auth-link text-black">Forgot password?</a>
