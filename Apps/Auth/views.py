@@ -64,7 +64,7 @@ def send_otp_view(request):
             identifier = request.POST.get('identifier', '').strip()
             user = User.objects.filter(email__iexact=identifier).first() or User.objects.filter(username__iexact=identifier).first()
             if not user:
-                messages.error(request, "No account found with that email or username.")
+                messages.error(request, "No account found with that email or username. ")
                 return redirect('auth:verify-email')
         else:
             return redirect('auth:login')
